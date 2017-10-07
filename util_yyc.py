@@ -75,13 +75,15 @@ def load_members(src, train_users, test_users):
 
                     if user_id in train_users:
                         train_users[user_id].add_member_info(base_yyc.MemberInstance(user_id, city, age, gender,
-                                                                               registered_via, registration_init_time,
-                                                                               expiration_date))
+                                                                                     registered_via,
+                                                                                     registration_init_time,
+                                                                                     expiration_date))
 
                     if user_id in test_users:
                         test_users[user_id].add_member_info(base_yyc.MemberInstance(user_id, city, age, gender,
-                                                                               registered_via, registration_init_time,
-                                                                               expiration_date))
+                                                                                    registered_via,
+                                                                                    registration_init_time,
+                                                                                    expiration_date))
 
 
 def load_logs(src, train_users, test_users):
