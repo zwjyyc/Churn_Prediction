@@ -56,3 +56,69 @@ class MemberInstance(object):
         self.registration_init_time = registration_init_time
         self.expiration_date = expiration_date
         self.registered_days = (expiration_date - registration_init_time).days
+
+
+class FeatureType:
+    Categorical = 'Categorical'
+    Numerical = 'Numerical'
+
+
+class FeatureBuilder(object):
+    def __init__(self, name, input_type, output_type, internal = 10):
+        self.name = name
+        self.input_type = input_type
+        self.output_type = output_type
+        self.value_dist = {}
+        self.boundary = [float('inf'), -float('inf')]
+        self.id_map = {}
+        self.internal = internal
+        self.dim = -1
+
+    def add_value(self, value):
+        if value not in self.value_dist:
+            self.value_dist[value] = 0
+            if self.input_type == FeatureType.Categorical:
+                id_size = len(self.id_map) + 1
+                self.id_map[value] = id_size
+
+            if self.input_type == FeatureType.Numerical:
+            if self.boundary[0] > value:
+                self.boundary[0] = value
+
+            if self.boundary[1] < value:
+                self.boundary[1] = value
+
+        self.value_dist[value] += 1
+
+    def get_dim(self):
+        if self.output_type == FeatureType.Numerical:
+            self.dim = 1
+            return 1
+        else:
+            if self.input_type == FeatureType.Categorical:
+                self.dim = len(self.value_dist) + 1
+                return self.dim
+            else:
+                self.dim = self.internal + 2
+                return self.dim
+
+    def value_2_feature(self, value):
+        if self.output_type == FeatureType.Numerical:
+            normalized_value = (value - self.boundary[0]) / (self.boundary[1] - self.boundary[0] + 1e-8)
+            return [normalized_value]
+        elif self.output_type == FeatureType.Categorical:
+            feature = [0] * self.dim
+            if self.input_type == FeatureType.Numerical:
+                if value < self.boundary[0]:
+                    feature[0] = 1
+                elif value > self.boundary[1]:
+                    feature[self.dim - 1] = 1
+                else:
+                    ind = (value - self.boundary[0]) * self.internal / (self.boundary[1] - self.boundary[0] + 1e-8)
+                    feature[int(ind)] = 1
+            elif self.input_type == FeatureType.Categorical:
+                feature[self.id_map.get(value, default=0)] = 1
+
+
+
+
