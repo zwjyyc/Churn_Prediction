@@ -1,4 +1,5 @@
 import os
+import sys
 import pickle
 
 import base_yyc
@@ -65,4 +66,18 @@ class FeatureExtractor(object):
         file_out = file(self.train_test_instances, 'wb')
         pickle.dump((self.users_train, self.users_test), file_out)
         print 'Done'
+
+    def unit_test(self, user_id):
+        if user_id in self.users_train:
+            print self.users_train[user_id]
+        elif user_id in self.users_test:
+            print self.users_test[user_id]
+        else:
+            print 'Not found!'
+
+src_dir = sys.argv[1]
+user_id = sys.argv[2]
+feature_extractor = FeatureExtractor(src_dir)
+feature_extractor.load_raw_data()
+feature_extractor.unit_test(user_id)
 
