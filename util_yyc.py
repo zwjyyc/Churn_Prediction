@@ -105,24 +105,23 @@ def load_logs(src, train_users, test_users):
                     print err_print
                 else:
                     user_id = items[0]
-                    
-		    if user_id in train_users:
-                        train_users[user_id].add_logs(','.join(items[1:]))
+                if user_id in train_users:
+                    train_users[user_id].add_logs(','.join(items[1:]))
 
-                    if user_id in test_users:
-                        test_users[user_id].add_logs(','.join(items[1:]))
-		
-		    continue
-		    date = datetime.date(2017, 10, 3)
+                if user_id in test_users:
+                    test_users[user_id].add_logs(','.join(items[1:]))
+                continue
 
-                    if len(items[1]) != 8:
-                        err_print = 'wrong input %s' % line
-                        print err_print
-                    else:
-                        year = int(items[1][:4])
-                        mon = int(items[1][4:6])
-                        day = int(items[1][6:8])
-                        date = datetime.date(year, mon, day)
+                date = datetime.date(2017, 10, 3)
+
+                if len(items[1]) != 8:
+                    err_print = 'wrong input %s' % line
+                    print err_print
+                else:
+                    year = int(items[1][:4])
+                    mon = int(items[1][4:6])
+                    day = int(items[1][6:8])
+                    date = datetime.date(year, mon, day)
 
                     num_25 = int(items[2])
                     num_50 = int(items[3])
@@ -133,10 +132,12 @@ def load_logs(src, train_users, test_users):
                     total_secs = float(items[8])
 
                     if user_id in train_users:
-                        train_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
+                        train_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75,
+                                                                           num_985, num_100, num_unq, total_secs))
 
                     if user_id in test_users:
-                        test_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
+                        test_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75,
+                                                                          num_985, num_100, num_unq, total_secs))
 
 
 def load_transactions(src, train_users, test_users):
@@ -160,49 +161,49 @@ def load_transactions(src, train_users, test_users):
                     print err_print
                 else:
                     user_id = items[0]
-		    if user_id in train_users:
-                        train_users[user_id].add_transactions(','.join(items[1:]))
+
+                if user_id in train_users:
+                    train_users[user_id].add_transactions(','.join(items[1:]))
+
+                if user_id in test_users:
+                    test_users[user_id].add_transactions(','.join(items[1:]))
+                continue
+
+                payment_method_id = int(items[1])
+                payment_plan_days = int(items[2])
+                plan_list_price = int(items[3])
+                actual_amount_paid = int(items[4])
+                is_auto_renew = int(items[5])
+
+                transaction_date = datetime.date(2017, 10, 3)
+                membership_expire_date = datetime.date(2017, 10, 3)
+
+                if len(items[6]) != 8 or len(items[7]) != 8:
+                    err_print = 'wrong input %s' % line
+                    print err_print
+                else:
+                    year = int(items[6][:4])
+                    mon = int(items[6][4:6])
+                    day = int(items[6][6:8])
+                    transaction_date = datetime.date(year, mon, day)
+
+                    year = int(items[7][:4])
+                    mon = int(items[7][4:6])
+                    day = int(items[7][6:8])
+                    membership_expire_date = datetime.date(year, mon, day)
+
+                    is_cancel = int(items[8])
+
+                    if user_id in train_users:
+                        train_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
+                                                                                    payment_plan_days, plan_list_price,
+                                                                                    actual_amount_paid, is_auto_renew,
+                                                                                    transaction_date,
+                                                                                    membership_expire_date, is_cancel))
 
                     if user_id in test_users:
-                        test_users[user_id].add_transactions(','.join(items[1:]))
-
-                    continue
-
-                    payment_method_id = int(items[1])
-                    payment_plan_days = int(items[2])
-                    plan_list_price = int(items[3])
-                    actual_amount_paid = int(items[4])
-                    is_auto_renew = int(items[5])
-
-                    transaction_date = datetime.date(2017, 10, 3)
-                    membership_expire_date = datetime.date(2017, 10, 3)
-
-                    if len(items[6]) != 8 or len(items[7]) != 8:
-                        err_print = 'wrong input %s' % line
-                        print err_print
-                    else:
-                        year = int(items[6][:4])
-                        mon = int(items[6][4:6])
-                        day = int(items[6][6:8])
-                        transaction_date = datetime.date(year, mon, day)
-
-                        year = int(items[7][:4])
-                        mon = int(items[7][4:6])
-                        day = int(items[7][6:8])
-                        membership_expire_date = datetime.date(year, mon, day)
-
-                        is_cancel = int(items[8])
-
-                    	if user_id in train_users:
-                            train_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
+                        test_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
                                                                                    payment_plan_days, plan_list_price,
                                                                                    actual_amount_paid, is_auto_renew,
                                                                                    transaction_date,
                                                                                    membership_expire_date, is_cancel))
-
-                    	if user_id in test_users:
-                            test_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
-                                                                                  payment_plan_days, plan_list_price,
-                                                                                  actual_amount_paid, is_auto_renew,
-                                                                                  transaction_date,
-                                                                                  membership_expire_date, is_cancel))
