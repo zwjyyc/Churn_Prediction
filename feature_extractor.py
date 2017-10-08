@@ -14,7 +14,7 @@ class FeatureExtractor(object):
         self.user_logs_csv = src + 'user_logs.csv'
         self.members_csv = src + 'members.csv'
         #
-        src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
+        src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
         self.train_instances = src_ + 'instances.train.dump'
         self.test_instances = src_ + 'instances.test.dump'
 

@@ -223,7 +223,7 @@ def load_line_iterator(src):
 
 
 def string_2_instance(line):
-    items = line.split(',')
+    items = line.split('\t')
     user_instance = base_yyc.UserInstance(items[0], int(items[1]))
     user_instance.add_member_info(items[2])
 
@@ -238,24 +238,33 @@ def string_2_instance(line):
     return user_instance
 
 
-def instance_2_string(instance):
-    user_id = instance.key
-    user_instance = instance.value
+def instance_2_string(user_id, instance):
+    user_id = user_id
+    user_instance = instance
+    #print user_id
+	
     items = []
     items.append(user_id)
     items.append(str(user_instance.is_churn))
-    items.append(user_instance.member_info)
+
+    if user_instance.member_info:
+    	items.append(user_instance.member_info)
+    else:
+ 	return None
 
     logs = '#@#'.join(user_instance.logs)
     items.append(logs)
 
     transactions = '#@#'.join(user_instance.transactions)
     items.append(transactions)
-    return ','.join(items)
+   
+    return '\t'.join(items)
 
 
 def instances_2_file(src, instances):
     with open(src, 'w') as fout:
-        for instance in instances:
-            fout.write(instance_2_string(instance) + '\n')
+        for user_id, instance in instances.iteritems():
+	    out_str = instance_2_string(user_id, instance)
+            if out_str:
+		fout.write(out_str + '\n')
 
