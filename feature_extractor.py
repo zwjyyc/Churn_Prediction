@@ -11,14 +11,18 @@ class FeatureExtractor(object):
         self.train_csv = src + 'train.csv'
         self.test_csv = src + 'sample_submission_zero.csv'
         self.transactions_csv = src + 'transactions.csv'
-        self.user_logs_csv = src + 'users_logs.csv'
+        self.user_logs_csv = src + 'user_logs.csv'
         self.members_csv = src + 'members.csv'
-        self.train_test_instances = src + 'instances.pickle'
+        
+	# 
+	src_ = '/data2/kkbox/Churn_Prediction/src/yyc/data/'
+	self.train_test_instances = src_ + 'instances.pickle'
 
         self.users_train = {}
         self.users_test = {}
 
         self.is_loaded = os.path.exists(self.train_test_instances)
+	print self.is_loaded	
 
         assert os.path.exists(self.train_csv), 'train.csv does not exist'
         assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
@@ -39,33 +43,33 @@ class FeatureExtractor(object):
         progress_print = 'Begin to solve %s' % self.train_csv
         print progress_print
         util_yyc.load_train_test(self.train_csv, self.users_train)
-        print 'Done'
+        print '\nDone'
         progress_print = 'Begin to solve %s' % self.test_csv
         print progress_print
         util_yyc.load_train_test(self.test_csv, self.users_test)
-        print 'Done'
+        print '\nDone'
 
         progress_print = 'Begin to solve %s' % self.members_csv
         print progress_print
-        util_yyc.load_members(self.members_cvs, self.users_train, self.users__test)
-        print 'Done'
+        util_yyc.load_members(self.members_csv, self.users_train, self.users_test)
+        print '\nDone'
 
         progress_print = 'Begin to solve %s' % self.user_logs_csv
         print progress_print
         util_yyc.load_logs(self.user_logs_csv, self.users_train, self.users_test)
-        print 'Done'
+        print '\nDone'
 
         progress_print = 'Begin to solve %s' % self.transactions_csv
         print progress_print
         util_yyc.load_transactions(self.transactions_csv, self.users_train, self.users_test)
-        print 'Done'
+        print '\nDone'
 
         # save
         progress_print = 'Begin to save %s' % self.train_test_instances
         print progress_print
         file_out = file(self.train_test_instances, 'wb')
         pickle.dump((self.users_train, self.users_test), file_out)
-        print 'Done'
+        print '\nDone'
 
     def unit_test(self, user_id):
         if user_id in self.users_train:
@@ -78,6 +82,5 @@ class FeatureExtractor(object):
 src_dir = sys.argv[1]
 user_id = sys.argv[2]
 feature_extractor = FeatureExtractor(src_dir)
-feature_extractor.load_raw_data()
 feature_extractor.unit_test(user_id)
 

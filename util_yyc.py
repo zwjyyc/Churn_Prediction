@@ -3,11 +3,10 @@ import base_yyc
 import datetime
 import sys
 
-print_per_block = 1e8
+print_per_block = 1e6
 
 
-def load_train_test(src):
-    users = {}
+def load_train_test(src, users):
     with open(src, 'r') as fin:
         num_column = -1
         flag = False
@@ -27,7 +26,6 @@ def load_train_test(src):
 
                     if user_id not in users:
                         users[user_id] = base_yyc.UserInstance(user_id, is_churn)
-    return users
 
 
 def load_members(src, train_users, test_users):
@@ -38,7 +36,7 @@ def load_members(src, train_users, test_users):
         for line in fin:
             cnt += 1
             if cnt % print_per_block == 0:
-                sys.stdout.write('%d%%r' % cnt)
+                sys.stdout.write('%d\r' % cnt)
                 sys.stdout.flush()
 
             if not flag:
@@ -94,7 +92,7 @@ def load_logs(src, train_users, test_users):
         for line in fin:
             cnt += 1
             if cnt % print_per_block == 0:
-                sys.stdout.write('%d%%r' % cnt)
+                sys.stdout.write('%d\r' % cnt)
                 sys.stdout.flush()
 
             if not flag:
@@ -107,7 +105,15 @@ def load_logs(src, train_users, test_users):
                     print err_print
                 else:
                     user_id = items[0]
-                    date = datetime.date(2017, 10, 3)
+                    
+		    if user_id in train_users:
+                        train_users[user_id].add_logs(','.join(items[1:]))
+
+                    if user_id in test_users:
+                        test_users[user_id].add_logs(','.join(items[1:]))
+		
+		    continue
+		    date = datetime.date(2017, 10, 3)
 
                     if len(items[1]) != 8:
                         err_print = 'wrong input %s' % line
@@ -127,10 +133,10 @@ def load_logs(src, train_users, test_users):
                     total_secs = float(items[8])
 
                     if user_id in train_users:
-                        train_users[user_id].add_log(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
+                        train_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
 
                     if user_id in test_users:
-                        test_users[user_id].add_log(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
+                        test_users[user_id].add_logs(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985, num_100, num_unq, total_secs))
 
 
 def load_transactions(src, train_users, test_users):
@@ -141,7 +147,7 @@ def load_transactions(src, train_users, test_users):
         for line in fin:
             cnt += 1
             if cnt % print_per_block == 0:
-                sys.stdout.write('%d%%r' % cnt)
+                sys.stdout.write('%d\r' % cnt)
                 sys.stdout.flush()
 
             if not flag:
@@ -154,6 +160,14 @@ def load_transactions(src, train_users, test_users):
                     print err_print
                 else:
                     user_id = items[0]
+		    if user_id in train_users:
+                        train_users[user_id].add_transactions(','.join(items[1:]))
+
+                    if user_id in test_users:
+                        test_users[user_id].add_transactions(','.join(items[1:]))
+
+                    continue
+
                     payment_method_id = int(items[1])
                     payment_plan_days = int(items[2])
                     plan_list_price = int(items[3])
@@ -179,15 +193,15 @@ def load_transactions(src, train_users, test_users):
 
                         is_cancel = int(items[8])
 
-                    if user_id in train_users:
-                        train_users[user_id].add_transaction(base_yyc.TranInstance(user_id, payment_method_id,
+                    	if user_id in train_users:
+                            train_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
                                                                                    payment_plan_days, plan_list_price,
                                                                                    actual_amount_paid, is_auto_renew,
                                                                                    transaction_date,
                                                                                    membership_expire_date, is_cancel))
 
-                    if user_id in test_users:
-                        test_users[user_id].add_transaction(base_yyc.TranInstance(user_id, payment_method_id,
+                    	if user_id in test_users:
+                            test_users[user_id].add_transactions(base_yyc.TranInstance(user_id, payment_method_id,
                                                                                   payment_plan_days, plan_list_price,
                                                                                   actual_amount_paid, is_auto_renew,
                                                                                   transaction_date,

@@ -82,11 +82,11 @@ class FeatureBuilder(object):
                 self.id_map[value] = id_size
 
             if self.input_type == FeatureType.Numerical:
-            if self.boundary[0] > value:
-                self.boundary[0] = value
+            	if self.boundary[0] > value:
+                    self.boundary[0] = value
 
-            if self.boundary[1] < value:
-                self.boundary[1] = value
+            	if self.boundary[1] < value:
+                    self.boundary[1] = value
 
         self.value_dist[value] += 1
 
