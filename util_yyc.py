@@ -49,6 +49,13 @@ def load_members(src, train_users, test_users):
                     print err_print
                 else:
                     user_id = items[0]
+                    if user_id in train_users:
+                        train_users[user_id].add_member_info(','.join(items[1:]))
+                    if user_id in test_users:
+                        test_users[user_id].add_member_info(','.join(items[1:]))
+
+                    continue
+
                     city = int(items[1])
                     age = int(items[2])
                     gender = items[3]
@@ -207,3 +214,48 @@ def load_transactions(src, train_users, test_users):
                                                                                    actual_amount_paid, is_auto_renew,
                                                                                    transaction_date,
                                                                                    membership_expire_date, is_cancel))
+
+
+def load_line_iterator(src):
+    with open(src, 'r') as fin:
+        for line in fin:
+            yield line.strip()
+
+
+def string_2_instance(line):
+    items = line.split(',')
+    user_instance = base_yyc.UserInstance(items[0], int(items[1]))
+    user_instance.add_member_info(items[2])
+
+    logs = items[3].split('#@#')
+    for log in logs:
+        user_instance.add_logs(log)
+
+    transactions = items[4].split('#@#')
+    for transaction in transactions:
+        user_instance.add_transactions(transaction)
+
+    return user_instance
+
+
+def instance_2_string(instance):
+    user_id = instance.key
+    user_instance = instance.value
+    items = []
+    items.append(user_id)
+    items.append(str(user_instance.is_churn))
+    items.append(user_instance.member_info)
+
+    logs = '#@#'.join(user_instance.logs)
+    items.append(logs)
+
+    transactions = '#@#'.join(user_instance.transactions)
+    items.append(transactions)
+    return ','.join(items)
+
+
+def instances_2_file(src, instances):
+    with open(src, 'w') as fout:
+        for instance in instances:
+            fout.write(instance_2_string(instance) + '\n')
+
