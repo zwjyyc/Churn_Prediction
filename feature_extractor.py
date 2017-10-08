@@ -14,7 +14,7 @@ class FeatureExtractor(object):
         self.user_logs_csv = src + 'user_logs.csv'
         self.members_csv = src + 'members.csv'
         #
-        src_ = '/data2/kkbox/Churn_Prediction/src/yyc/data/'
+        src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
         self.train_instances = src_ + 'instances.train.dump'
         self.test_instances = src_ + 'instances.test.dump'
 
@@ -88,7 +88,7 @@ class FeatureExtractor(object):
             print 'Not found!'
 
 src_dir = sys.argv[1]
-user_id = sys.argv[2]
+#user_id = sys.argv[2]
 feature_extractor = FeatureExtractor(src_dir)
 #feature_extractor.unit_test(user_id)
 
