@@ -1,6 +1,6 @@
 import os
 import sys
-import pickle
+import datetime
 
 import base_yyc
 import util_yyc
@@ -21,7 +21,7 @@ class FeatureExtractor(object):
         self.users_train = {}
         self.users_test = {}
         self.is_loaded = os.path.exists(self.train_instances) and os.path.exists(self.test_instances)
-        print self.is_loaded
+        #print self.is_loaded
 
         assert os.path.exists(self.train_csv), 'train.csv does not exist'
         assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
@@ -31,17 +31,14 @@ class FeatureExtractor(object):
 
         if not self.is_loaded:
             self.load_raw_data()
-        else:
-            #progress_print = 'Load dumped file %s' % self.train_instances
-            #print progress_print
-            #util_yyc.load_instances(self.train_instances, self.users_train)
-            #print 'Done'
 
-            #progress_print = 'Load dumped file %s' % self.test_instances
-            #print progress_print
-            #util_yyc.load_instances(self.test_instances, self.users_test)
-            #print 'Done'
-            return
+        self.config_file = src_ + 'configure.in'
+        self.users_train = {}
+        self.users_test = {}
+        self.feature_templates = {}
+
+        assert os.path.exists(self.config_file), 'configure.in does not exist'
+        util_yyc.load_configure(self.config_file, self.feature_templates)
 
     def load_raw_data(self):
         progress_print = 'Begin to solve %s' % self.train_csv

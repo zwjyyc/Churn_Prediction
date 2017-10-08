@@ -1,0 +1,17 @@
+Name=Age,InputType=Numerical,OutputType=Numerical,LowerBoundary=0,UpperBoundary=100
+Name=Registered_Days,InputType=Numerical,OutputType=Numerical
+
+Name=City,InputType=Categorical,OutputType=Categorical
+Name=Gender,InputType=Categorical,OutputType=Categorical
+Name=RegisteredVia,InputType=Categorical,OutputType=Categorical
+
+Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=Num50,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=Num75,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=Num985,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=Num100,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=NumUnq,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=TotalSecs,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+
+Name=NumLogs,InputType=Numerical,OutputType=Numerical
+Name=NumTrans,InputType=Numerical,OutputType=Numerical

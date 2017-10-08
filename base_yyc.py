@@ -63,15 +63,20 @@ class FeatureType:
     Numerical = 'Numerical'
 
 
-class FeatureBuilder(object):
-    def __init__(self, name, input_type, output_type, internal = 10):
+class FeatureTemplate(object):
+    def __init__(self, name, input_type, output_type,
+                 boundary=[float('inf'), -float('inf')],
+                 time_boundary=[datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)],
+                 internal=[]):
         self.name = name
         self.input_type = input_type
         self.output_type = output_type
-        self.value_dist = {}
-        self.boundary = [float('inf'), -float('inf')]
-        self.id_map = {}
+        self.boundary = boundary
+        self.time_boundary = time_boundary
         self.internal = internal
+
+        self.id_map = {}
+        self.value_dist = {}
         self.dim = -1
 
     def add_value(self, value):
@@ -82,10 +87,10 @@ class FeatureBuilder(object):
                 self.id_map[value] = id_size
 
             if self.input_type == FeatureType.Numerical:
-            	if self.boundary[0] > value:
+                if self.boundary[0] > value:
                     self.boundary[0] = value
 
-            	if self.boundary[1] < value:
+                if self.boundary[1] < value:
                     self.boundary[1] = value
 
         self.value_dist[value] += 1

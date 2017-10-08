@@ -241,16 +241,15 @@ def string_2_instance(line):
 def instance_2_string(user_id, instance):
     user_id = user_id
     user_instance = instance
-    #print user_id
-	
+
     items = []
     items.append(user_id)
     items.append(str(user_instance.is_churn))
 
     if user_instance.member_info:
-    	items.append(user_instance.member_info)
+        items.append(user_instance.member_info)
     else:
- 	return None
+        return None
 
     logs = '#@#'.join(user_instance.logs)
     items.append(logs)
@@ -264,7 +263,41 @@ def instance_2_string(user_id, instance):
 def instances_2_file(src, instances):
     with open(src, 'w') as fout:
         for user_id, instance in instances.iteritems():
-	    out_str = instance_2_string(user_id, instance)
+            out_str = instance_2_string(user_id, instance)
             if out_str:
-		fout.write(out_str + '\n')
+                fout.write(out_str + '\n')
 
+
+def load_configure(src, templates):
+    with open(src, 'r') as fin:
+        for line in fin:
+            line = line.strip()
+            if line and line[0] != '#':
+                name = ''
+                input_type = ''
+                output_type = ''
+                boundary = [float('inf'), -float('inf')]
+                time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)],
+                internal = []
+
+                items = line.split(',')
+                for item in items:
+                    _items = item.split('=')
+                    key = _items[0]
+                    value = _items[1]
+                    if key == 'Name':
+                        name = value
+                    elif key == 'InputType':
+                        input_type = value
+                    elif key == 'OutputType':
+                        output_type = value
+                    elif key == 'LowerBoundary':
+                        boundary[0] = float(value)
+                    elif key == 'UpperBoundary':
+                        boundary[1] = float(value)
+                    elif key == 'TimeInternal':
+                        internal = value.split('&')
+
+                if name not in templates:
+                    templates[name] = base_yyc.FeatureTemplate(name, input_type, output_type,
+                                                               boundary, time_boundary, internal)
