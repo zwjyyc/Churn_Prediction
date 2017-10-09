@@ -274,7 +274,7 @@ def string_2_member(line, user_id):
     if not line:
         return None
 
-    items = line.strip().split()
+    items = line.strip().split(',')
     city = int(items[0])
     age = int(items[1])
     gender = items[2]
