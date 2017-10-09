@@ -188,6 +188,11 @@ def load_line_iterator(src):
 
 def string_2_instance(line):
     items = line.split('\t')
+
+    if len(items) != 5:
+        print line
+        return None
+
     user_instance = base_yyc.UserInstance(items[0], int(items[1]))
     user_instance.add_member_info(items[2])
 

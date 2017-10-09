@@ -42,8 +42,8 @@ class FeatureExtractor(object):
         assert os.path.exists(self.config_file), 'configure.in does not exist'
         util_yyc.load_configure(self.config_file, self.feature_templates)
 
-        self.train_feature_dist = src_ + 'dist.train'
-        self.test_feature_dist = src_ + 'dist.test'
+        self.train_feature_dist = src_ + 'dist.train.'
+        self.test_feature_dist = src_ + 'dist.test.'
         self.build_features(self.train_instances, self.users_train, self.train_feature_dist)
         self.build_features(self.test_instances, self.users_test, self.test_feature_dist)
 
@@ -60,32 +60,36 @@ class FeatureExtractor(object):
                 if not line:
                     continue
                 user_instance = util_yyc.string_2_instance(line.strip())
+                if not user_instance:
+                    continue
+
                 member_info = user_instance.member_info
                 member_info = util_yyc.string_2_member(member_info, user_instance.user_id)
-
-		if not member_info:
-		    continue
 
                 if 'Age' in self.feature_templates:
                     age = member_info.age
                     self.feature_templates['Age'].add_value(age)
-                elif 'City' in self.feature_templates:
+
+                if 'City' in self.feature_templates:
                     city = member_info.city
                     self.feature_templates['City'].add_value(city)
-                elif 'Gender' in self.feature_templates:
+
+                if 'Gender' in self.feature_templates:
                     gender = member_info.gender
                     self.feature_templates['Gender'].add_value(gender)
-                elif 'RegisteredDays' in self.feature_templates:
+
+                if 'RegisteredDays' in self.feature_templates:
                     registered_days = member_info.registered_days
                     self.feature_templates['RegisteredDays'].add_value(registered_days)
-                elif 'RegisteredVia' in self.feature_templates:
+
+                if 'RegisteredVia' in self.feature_templates:
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via)
 
         for name, feature_template in self.feature_templates.items():
             if len(feature_template.value_dist) == 0:
                 continue
-            file_name = outfile + name + '.dist'
+            file_name = outfile + name
             util_yyc.dict_2_file(feature_template.value_dist, file_name)
 
         # build categorical features
