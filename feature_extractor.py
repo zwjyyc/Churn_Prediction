@@ -5,6 +5,8 @@ import datetime
 import base_yyc
 import util_yyc
 
+print_per_block = 1e6
+
 
 class FeatureExtractor(object):
     def __init__(self, src):
@@ -40,13 +42,21 @@ class FeatureExtractor(object):
         assert os.path.exists(self.config_file), 'configure.in does not exist'
         util_yyc.load_configure(self.config_file, self.feature_templates)
 
-        self.build_features(self.train_instances, self.users_train)
-        self.build_features(self.test_instances, self.users_test)
+        self.train_feature_dist = src_ + 'dist.train'
+        self.test_feature_dist = src_ + 'dist.test'
+        self.build_features(self.train_instances, self.users_train, self.train_feature_dist)
+        self.build_features(self.test_instances, self.users_test, self.test_feature_dist)
 
-    def build_features(self, src, features):
+    def build_features(self, src, features, outfile):
         # fill feature_templates
         with open(src, 'r') as fin:
+            cnt = 0
             for line in fin:
+                cnt += 1
+                if cnt % print_per_block == 0:
+                    sys.stdout.write('%d\r' % cnt)
+                    sys.stdout.flush()
+
                 if not line:
                     continue
                 user_instance = util_yyc.string_2_instance(line.strip())
@@ -69,7 +79,11 @@ class FeatureExtractor(object):
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via)
 
-
+        for feature_template in self.feature_templates:
+            if len(feature_template.value_dist) == 0:
+                continue
+            file_name = outfile + feature_template.name + '.dist'
+            util_yyc.dict_2_file(feature_template.value_dist, file_name)
 
         # build categorical features
 
@@ -121,7 +135,5 @@ class FeatureExtractor(object):
             print 'Not found!'
 
 src_dir = sys.argv[1]
-#user_id = sys.argv[2]
 feature_extractor = FeatureExtractor(src_dir)
-#feature_extractor.unit_test(user_id)
 

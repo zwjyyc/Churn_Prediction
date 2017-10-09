@@ -301,3 +301,9 @@ def string_2_member(line, user_id):
                                 registration_init_time,
                                 expiration_date)
         return
+
+
+def dict_2_file(dic, src):
+    with open(dic, 'w') as fout:
+        for key, value in sorted(dic.items()):
+            fout.write(str(key) + ':' + str(value) + '\n')
