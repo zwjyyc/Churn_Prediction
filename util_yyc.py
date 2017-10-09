@@ -243,6 +243,7 @@ def load_configure(src, templates):
                 boundary = [float('inf'), -float('inf')]
                 time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)],
                 internal = []
+                time_internal = []
 
                 items = line.split(',')
                 for item in items:
