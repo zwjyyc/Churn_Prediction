@@ -62,6 +62,14 @@ class FeatureExtractor(object):
                 elif 'Gender' in self.feature_templates:
                     gender = member_info.gender
                     self.feature_templates['Gender'].add_value(gender)
+                elif 'RegisteredDays' in self.feature_templates:
+                    registered_days = member_info.registered_days
+                    self.feature_templates['RegisteredDays'].add_value(registered_days)
+                elif 'RegisteredVia' in self.feature_templates:
+                    registered_via = member_info.registered_via
+                    self.feature_templates['RegisteredVia'].add_value(registered_via)
+
+
 
         # build categorical features
 

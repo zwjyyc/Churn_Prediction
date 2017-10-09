@@ -1,8 +1,8 @@
 Name=Age,InputType=Numerical,OutputType=Categorical,LowerBoundary=0,UpperBoundary=100,Internal=5&10&15
-Name=Registered_Days,InputType=Numerical,OutputType=Numerical
-
+Name=RegisteredDays,InputType=Numerical,OutputType=Numerical
 Name=City,InputType=Categorical,OutputType=Categorical
 Name=Gender,InputType=Categorical,OutputType=Categorical
+
 Name=RegisteredVia,InputType=Categorical,OutputType=Categorical
 
 Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
