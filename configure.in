@@ -1,4 +1,4 @@
-Name=Age,InputType=Numerical,OutputType=Numerical,LowerBoundary=0,UpperBoundary=100
+Name=Age,InputType=Numerical,OutputType=Categorical,LowerBoundary=0,UpperBoundary=100,Internal=5&10&15
 Name=Registered_Days,InputType=Numerical,OutputType=Numerical
 
 Name=City,InputType=Categorical,OutputType=Categorical

@@ -54,42 +54,6 @@ def load_members(src, train_users, test_users):
                     if user_id in test_users:
                         test_users[user_id].add_member_info(','.join(items[1:]))
 
-                    continue
-
-                    city = int(items[1])
-                    age = int(items[2])
-                    gender = items[3]
-                    registered_via = int(items[4])
-
-                    registration_init_time = datetime.date(2017, 10, 3)
-                    expiration_date = datetime.date(2017, 10, 3)
-
-                    if len(items[5]) != 8 or len(items[6]) != 8:
-                        err_print = 'wrong input %s' % line
-                        print err_print
-                    else:
-                        year = int(items[5][:4])
-                        mon = int(items[5][4:6])
-                        day = int(items[5][6:8])
-                        registration_init_time = datetime.date(year, mon, day)
-
-                        year = int(items[6][:4])
-                        mon = int(items[6][4:6])
-                        day = int(items[6][6:8])
-                        expiration_date = datetime.date(year, mon, day)
-
-                    if user_id in train_users:
-                        train_users[user_id].add_member_info(base_yyc.MemberInstance(user_id, city, age, gender,
-                                                                                     registered_via,
-                                                                                     registration_init_time,
-                                                                                     expiration_date))
-
-                    if user_id in test_users:
-                        test_users[user_id].add_member_info(base_yyc.MemberInstance(user_id, city, age, gender,
-                                                                                    registered_via,
-                                                                                    registration_init_time,
-                                                                                    expiration_date))
-
 
 def load_logs(src, train_users, test_users):
     with open(src, 'r') as fin:
@@ -296,8 +260,44 @@ def load_configure(src, templates):
                     elif key == 'UpperBoundary':
                         boundary[1] = float(value)
                     elif key == 'TimeInternal':
-                        internal = value.split('&')
-
+                        time_internal = [int(item) for item in value.split('&')]
+                    elif key == 'Internal':
+                        internal = [int(item) for item in value.split('&')]
                 if name not in templates:
                     templates[name] = base_yyc.FeatureTemplate(name, input_type, output_type,
-                                                               boundary, time_boundary, internal)
+                                                               boundary, time_boundary, internal,
+                                                               time_internal)
+
+
+def string_2_member(line, user_id):
+    if not line:
+        return None
+
+    items = line.strip().split()
+    city = int(items[0])
+    age = int(items[1])
+    gender = items[2]
+    registered_via = int(items[3])
+
+    registration_init_time = datetime.date(2017, 10, 3)
+    expiration_date = datetime.date(2017, 10, 3)
+
+    if len(items[4]) != 8 or len(items[5]) != 8:
+        err_print = 'wrong input %s' % line
+        print err_print
+        return None
+    else:
+        year = int(items[4][:4])
+        mon = int(items[4][4:6])
+        day = int(items[4][6:8])
+        registration_init_time = datetime.date(year, mon, day)
+
+        year = int(items[5][:4])
+        mon = int(items[5][4:6])
+        day = int(items[5][6:8])
+        expiration_date = datetime.date(year, mon, day)
+        base_yyc.MemberInstance(user_id, city, age, gender,
+                                registered_via,
+                                registration_init_time,
+                                expiration_date)
+        return

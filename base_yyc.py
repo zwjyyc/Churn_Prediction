@@ -65,15 +65,26 @@ class FeatureType:
 
 class FeatureTemplate(object):
     def __init__(self, name, input_type, output_type,
-                 boundary=[float('inf'), -float('inf')],
-                 time_boundary=[datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)],
-                 internal=[]):
+                 boundary=[],
+                 time_boundary=[],
+                 internal=[],
+                 time_internal=[]):
         self.name = name
         self.input_type = input_type
         self.output_type = output_type
+
         self.boundary = boundary
+        self.boundary_given = len(boundary) > 0
+        if not self.boundary_given:
+            self.boundary = [float('inf'), -float('inf')]
+
         self.time_boundary = time_boundary
+        self.time_boundary_given = len(time_boundary) > 0
+        if not self.time_boundary_given:
+            self.time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)]
+
         self.internal = internal
+        self.time_internal = time_internal
 
         self.id_map = {}
         self.value_dist = {}
@@ -86,7 +97,7 @@ class FeatureTemplate(object):
                 id_size = len(self.id_map) + 1
                 self.id_map[value] = id_size
 
-            if self.input_type == FeatureType.Numerical:
+            if self.input_type == FeatureType.Numerical and not self.boundary_given:
                 if self.boundary[0] > value:
                     self.boundary[0] = value
 

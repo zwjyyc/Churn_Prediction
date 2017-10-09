@@ -21,7 +21,7 @@ class FeatureExtractor(object):
         self.users_train = {}
         self.users_test = {}
         self.is_loaded = os.path.exists(self.train_instances) and os.path.exists(self.test_instances)
-        #print self.is_loaded
+        print self.is_loaded
 
         assert os.path.exists(self.train_csv), 'train.csv does not exist'
         assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
@@ -39,6 +39,34 @@ class FeatureExtractor(object):
 
         assert os.path.exists(self.config_file), 'configure.in does not exist'
         util_yyc.load_configure(self.config_file, self.feature_templates)
+
+        self.build_features(self.train_instances, self.users_train)
+        self.build_features(self.test_instances, self.users_test)
+
+    def build_features(self, src, features):
+        # fill feature_templates
+        with open(src, 'r') as fin:
+            for line in fin:
+                if not line:
+                    continue
+                user_instance = util_yyc.string_2_instance(line.strip())
+                member_info = user_instance.member_info
+                member_info = util_yyc.string_2_member(member_info, user_instance.user_id)
+
+                if 'Age' in self.feature_templates:
+                    age = member_info.age
+                    self.feature_templates['Age'].add_value(age)
+                elif 'City' in self.feature_templates:
+                    city = member_info.city
+                    self.feature_templates['City'].add_value(city)
+                elif 'Gender' in self.feature_templates:
+                    gender = member_info.gender
+                    self.feature_templates['Gender'].add_value(gender)
+
+        # build categorical features
+
+
+        # build numerical features
 
     def load_raw_data(self):
         progress_print = 'Begin to solve %s' % self.train_csv
