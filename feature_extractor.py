@@ -5,7 +5,7 @@ import datetime
 import base_yyc
 import util_yyc
 
-print_per_block = 1e6
+print_per_block = 1e5
 
 
 class FeatureExtractor(object):
@@ -63,6 +63,9 @@ class FeatureExtractor(object):
                 member_info = user_instance.member_info
                 member_info = util_yyc.string_2_member(member_info, user_instance.user_id)
 
+		if not member_info:
+		    continue
+
                 if 'Age' in self.feature_templates:
                     age = member_info.age
                     self.feature_templates['Age'].add_value(age)
@@ -79,10 +82,10 @@ class FeatureExtractor(object):
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via)
 
-        for feature_template in self.feature_templates:
+        for name, feature_template in self.feature_templates.items():
             if len(feature_template.value_dist) == 0:
                 continue
-            file_name = outfile + feature_template.name + '.dist'
+            file_name = outfile + name + '.dist'
             util_yyc.dict_2_file(feature_template.value_dist, file_name)
 
         # build categorical features

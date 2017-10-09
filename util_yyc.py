@@ -297,14 +297,14 @@ def string_2_member(line, user_id):
         mon = int(items[5][4:6])
         day = int(items[5][6:8])
         expiration_date = datetime.date(year, mon, day)
-        base_yyc.MemberInstance(user_id, city, age, gender,
+        member = base_yyc.MemberInstance(user_id, city, age, gender,
                                 registered_via,
                                 registration_init_time,
                                 expiration_date)
-        return
+        return member
 
 
 def dict_2_file(dic, src):
-    with open(dic, 'w') as fout:
+    with open(src, 'w') as fout:
         for key, value in sorted(dic.items()):
             fout.write(str(key) + ':' + str(value) + '\n')
