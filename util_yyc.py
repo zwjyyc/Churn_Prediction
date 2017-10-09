@@ -190,7 +190,6 @@ def string_2_instance(line):
     items = line.split('\t')
 
     if len(items) != 5:
-        print line
         return None
 
     user_instance = base_yyc.UserInstance(items[0], int(items[1]))
