@@ -66,35 +66,44 @@ class FeatureExtractor(object):
                     continue
 
                 member_info = user_instance.member_info
+                label = user_instance.is_churn
                 member_info = util_yyc.string_2_member(member_info, user_instance.user_id)
 
                 if 'Age' in self.feature_templates:
                     age = member_info.age
-                    self.feature_templates['Age'].add_value(age)
+                    self.feature_templates['Age'].add_value(age, label)
 
                 if 'City' in self.feature_templates:
                     city = member_info.city
-                    self.feature_templates['City'].add_value(city)
+                    self.feature_templates['City'].add_value(city, label)
 
                 if 'Gender' in self.feature_templates:
                     gender = member_info.gender
-                    self.feature_templates['Gender'].add_value(gender)
+                    self.feature_templates['Gender'].add_value(gender, label)
 
                 if 'RegisteredDays' in self.feature_templates:
                     registered_days = member_info.registered_days
-                    self.feature_templates['RegisteredDays'].add_value(registered_days)
+                    self.feature_templates['RegisteredDays'].add_value(registered_days, label)
 
                 if 'RegisteredVia' in self.feature_templates:
                     registered_via = member_info.registered_via
-                    self.feature_templates['RegisteredVia'].add_value(registered_via)
+                    self.feature_templates['RegisteredVia'].add_value(registered_via, label)
+
+                logs = user_instance.logs
+                if 'NumLogs' in self.feature_templates and logs:
+                    self.feature_templates['NumLogs'].add_value(len(logs), label)
+
+                transactions = user_instance.transactions
+                if 'NumsTrans' in self.feature_templates and transactions:
+                    self.feature_templates['NumsTrans'].add_value(len(transactions), label)
+
 
         print '%d/%d missing!' % (wcnt, cnt)
         for name, feature_template in self.feature_templates.items():
             if len(feature_template.value_dist) == 0:
                 continue
             file_name = outfile + name
-            util_yyc.dict_2_file(feature_template.value_dist, file_name)
-
+            util_yyc.dict_dict_2_file(feature_template.value_dist, feature_template.label_dist, file_name)
         # build categorical features
 
 

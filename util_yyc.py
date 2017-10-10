@@ -195,13 +195,15 @@ def string_2_instance(line):
     user_instance = base_yyc.UserInstance(items[0], int(items[1]))
     user_instance.add_member_info(items[2])
 
-    logs = items[3].split('#@#')
-    for log in logs:
-        user_instance.add_logs(log)
+    if items[3]:
+        logs = items[3].split('#@#')
+        for log in logs:
+            user_instance.add_logs(log)
 
-    transactions = items[4].split('#@#')
-    for transaction in transactions:
-        user_instance.add_transactions(transaction)
+    if items[4]:
+        transactions = items[4].split('#@#')
+        for transaction in transactions:
+            user_instance.add_transactions(transaction)
 
     return user_instance
 
@@ -302,9 +304,9 @@ def string_2_member(line, user_id):
         day = int(items[5][6:8])
         expiration_date = datetime.date(year, mon, day)
         member = base_yyc.MemberInstance(user_id, city, age, gender,
-                                registered_via,
-                                registration_init_time,
-                                expiration_date)
+                                         registered_via,
+                                         registration_init_time,
+                                         expiration_date)
         return member
 
 
@@ -312,3 +314,15 @@ def dict_2_file(dic, src):
     with open(src, 'w') as fout:
         for key, value in sorted(dic.items()):
             fout.write(str(key) + ':' + str(value) + '\n')
+
+
+def dict_dict_2_file(dic1, dic2, src):
+    with open(src, 'w') as fout:
+        for key, value in sorted(dic1.items()):
+            label_dist = dic2[key]
+            out_str = str(key) + ':' + str(value)
+
+            for key_, value_ in sorted(label_dist.items(), key=lambda (k, v): (v, k)):
+                out_str += '@#@' + str(key_) + ':' + str(value_)
+
+            fout.write(out_str + '\n')

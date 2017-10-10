@@ -88,11 +88,13 @@ class FeatureTemplate(object):
 
         self.id_map = {}
         self.value_dist = {}
+        self.label_dist = {}
         self.dim = -1
 
-    def add_value(self, value):
+    def add_value(self, value, label):
         if value not in self.value_dist:
             self.value_dist[value] = 0
+            self.label_dist[value] = {}
             if self.input_type == FeatureType.Categorical:
                 id_size = len(self.id_map) + 1
                 self.id_map[value] = id_size
@@ -105,6 +107,10 @@ class FeatureTemplate(object):
                     self.boundary[1] = value
 
         self.value_dist[value] += 1
+        if label not in self.value_dist[value]:
+            self.value_dist[value][label] = 0
+
+        self.value_dist[value][label] += 1
 
     def get_dim(self):
         if self.output_type == FeatureType.Numerical:
