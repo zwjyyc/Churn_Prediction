@@ -51,7 +51,7 @@ class FeatureExtractor(object):
         # fill feature_templates
         with open(src, 'r') as fin:
             cnt = 0
-	    wcnt = 0
+            wcnt = 0
             for line in fin:
                 cnt += 1
                 if cnt % print_per_block == 0:
@@ -62,7 +62,7 @@ class FeatureExtractor(object):
                     continue
                 user_instance = util_yyc.string_2_instance(line.strip())
                 if not user_instance:
-		    wcnt += 1
+                    wcnt += 1
                     continue
 
                 member_info = user_instance.member_info
@@ -87,8 +87,8 @@ class FeatureExtractor(object):
                 if 'RegisteredVia' in self.feature_templates:
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via)
-	
-	print '%d/%d missing!' % (wcnt, cnt)
+
+        print '%d/%d missing!' % (wcnt, cnt)
         for name, feature_template in self.feature_templates.items():
             if len(feature_template.value_dist) == 0:
                 continue
