@@ -60,7 +60,7 @@ class FeatureExtractor(object):
 
                 if not line:
                     continue
-                user_instance = util_yyc.string_2_instance(line.strip())
+                user_instance = util_yyc.string_2_instance(line.strip('\n'))
                 if not user_instance:
                     wcnt += 1
                     continue
