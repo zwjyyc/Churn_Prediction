@@ -325,4 +325,8 @@ def dict_dict_2_file(dic1, dic2, src):
             for key_, value_ in sorted(label_dist.items(), key=lambda (k, v): (v, k)):
                 out_str += '@#@' + str(key_) + ':' + str(value_)
 
+	    if 0 in label_dist and 1 in label_dist:
+		cnt = label_dist[0] + label_dist[1]
+		c_cnt = label_dist[1]
+		out_str += '@#@' + str(c_cnt * 1.0 / cnt)
             fout.write(out_str + '\n')

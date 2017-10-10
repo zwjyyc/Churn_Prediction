@@ -94,8 +94,8 @@ class FeatureExtractor(object):
                     self.feature_templates['NumLogs'].add_value(len(logs), label)
 
                 transactions = user_instance.transactions
-                if 'NumsTrans' in self.feature_templates and transactions:
-                    self.feature_templates['NumsTrans'].add_value(len(transactions), label)
+                if 'NumTrans' in self.feature_templates and transactions:
+                    self.feature_templates['NumTrans'].add_value(len(transactions), label)
 
 
         print '%d/%d missing!' % (wcnt, cnt)

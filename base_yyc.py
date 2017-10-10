@@ -107,10 +107,10 @@ class FeatureTemplate(object):
                     self.boundary[1] = value
 
         self.value_dist[value] += 1
-        if label not in self.value_dist[value]:
-            self.value_dist[value][label] = 0
+        if label not in self.label_dist[value]:
+            self.label_dist[value][label] = 0
 
-        self.value_dist[value][label] += 1
+        self.label_dist[value][label] += 1
 
     def get_dim(self):
         if self.output_type == FeatureType.Numerical:
