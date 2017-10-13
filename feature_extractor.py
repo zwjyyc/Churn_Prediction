@@ -129,18 +129,70 @@ class FeatureExtractor(object):
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
 
                 feature_set = ['Num25', 'Num50', 'Num75', 'Num985', 'Num100', 'NumUnq', 'TotalSecs']
-                for feature_name in feature_set:
-                    if feature_name in self.feature_templates:
-                        values = []
-                        dates = []
-                        if logs:
-                            values = [log.num25 for log in logs]
-                            dates = [log.date for log in logs]
-                        feature = self.feature_templates[feature_name].value_2_features(values, dates)
-                        #judge dimension
-                        # assert self.feature_templates['Num25'].feature_dim == len(feature)
-                        features[user_id].append(feature)
+                if 'Num25' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_25 for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['Num25'].value_2_features(values, dates)
+                    #judge dimension
+                    features[user_id].append(feature)
 
+                if 'Num50' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_50 for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['Num50'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+
+                if 'Num75' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_75 for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['Num75'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+
+                if 'Num985' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_985 for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['Num985'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+
+                if 'Num100' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_100 for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['Num100'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+
+                if 'NumUnq' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.num_unq for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['NumUnq'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+
+                if 'TotalSecs' in self.feature_templates:
+                    values = []
+                    dates = []
+                    if logs:
+                        values = [log.total_secs for log in logs]
+                        dates = [log.date for log in logs]
+                    feature = self.feature_templates['TotalSecs'].value_2_features(values, dates)
+                    features[user_id].append(feature)
+                    
         print 'Begin to write features to file'
         file_name = outfile + 'rawfeature'
         util_yyc.features_2_file(features, file_name)

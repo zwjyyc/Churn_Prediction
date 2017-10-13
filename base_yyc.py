@@ -79,10 +79,10 @@ class FeatureTemplate(object):
             self.boundary = [float('inf'), -float('inf')]
 
         self.time_boundary = time_boundary
-	self.boundary_given = len(time_boundary) > 0
-	if not self.boundary_given:
-	    self.time_boundary = [datetime.date(2018,1,1), datetime.date(1990,1,1)]
-	
+        self.boundary_given = len(time_boundary) > 0
+        if not self.boundary_given:
+            self.time_boundary = [datetime.date(2018,1,1), datetime.date(1990,1,1)]
+
         self.days_gap = (self.time_boundary[1] - self.time_boundary[0]).days
         self.internal = internal
         self.time_internal = time_internal
