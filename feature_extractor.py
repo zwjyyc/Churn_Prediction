@@ -126,7 +126,7 @@ class FeatureExtractor(object):
                 if user_id not in features:
                     features[user_id] = [label]
 
-                logs = util_yyc.strings_2_logs(user_instance.logs)
+                logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
 
                 feature_set = ['Num25', 'Num50', 'Num75', 'Num985', 'Num100', 'NumUnq', 'TotalSecs']
                 for feature_name in feature_set:
@@ -136,7 +136,7 @@ class FeatureExtractor(object):
                         if logs:
                             values = [log.num25 for log in logs]
                             dates = [log.date for log in logs]
-                        feature = self.feature_templates['Num25'].value_2_feature(values, dates)
+                        feature = self.feature_templates[feature_name].value_2_features(values, dates)
                         #judge dimension
                         # assert self.feature_templates['Num25'].feature_dim == len(feature)
                         features[user_id].append(feature)

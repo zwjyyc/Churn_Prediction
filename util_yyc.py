@@ -247,7 +247,7 @@ def load_configure(src, templates):
                 input_type = ''
                 output_type = ''
                 boundary = [float('inf'), -float('inf')]
-                time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)],
+                time_boundary = [datetime.date(2018, 1, 1), datetime.date(2000, 1, 1)]
                 internal = []
                 time_internal = []
 
@@ -336,22 +336,22 @@ def strings_2_logs(lines, user_id):
         items = line.split(',')
         date = datetime.date(2017, 10, 3)
 
-        if len(items[1]) != 8:
+        if len(items[0]) != 8:
             err_print = 'wrong input %s' % line
             print err_print
         else:
-            year = int(items[1][:4])
-            mon = int(items[1][4:6])
-            day = int(items[1][6:8])
+            year = int(items[0][:4])
+            mon = int(items[0][4:6])
+            day = int(items[0][6:8])
             date = datetime.date(year, mon, day)
 
-            num_25 = int(items[2])
-            num_50 = int(items[3])
-            num_75 = int(items[4])
-            num_985 = int(items[5])
-            num_100 = int(items[6])
-            num_unq = int(items[7])
-            total_secs = float(items[8])
+            num_25 = int(items[1])
+            num_50 = int(items[2])
+            num_75 = int(items[3])
+            num_985 = int(items[4])
+            num_100 = int(items[5])
+            num_unq = int(items[6])
+            total_secs = float(items[7])
             logs.append(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985,
                                              num_100, num_unq, total_secs))
     return logs

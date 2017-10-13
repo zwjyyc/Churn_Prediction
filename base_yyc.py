@@ -79,11 +79,11 @@ class FeatureTemplate(object):
             self.boundary = [float('inf'), -float('inf')]
 
         self.time_boundary = time_boundary
-        self.time_boundary_given = len(time_boundary) > 0
-        if not self.time_boundary_given:
-            self.time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)]
-
-        self.days_gap = (self.time_boundary[1] - self.time_boundary[2]).days
+	self.boundary_given = len(time_boundary) > 0
+	if not self.boundary_given:
+	    self.time_boundary = [datetime.date(2018,1,1), datetime.date(1990,1,1)]
+	
+        self.days_gap = (self.time_boundary[1] - self.time_boundary[0]).days
         self.internal = internal
         self.time_internal = time_internal
 
@@ -92,7 +92,7 @@ class FeatureTemplate(object):
         self.label_dist = {}
         self.dim = -1
 
-    def value_2_feature(self, values, dates):
+    def value_2_features(self, values, dates):
         if not self.internal:
             self.internal = [1]
 
@@ -100,8 +100,7 @@ class FeatureTemplate(object):
             cnt = 0
             for num in self.time_internal:
                 cnt += num
-
-        self.dim = cnt
+            self.dim = cnt
 
         feature = [] * self.dim
         for num in self.time_internal:
