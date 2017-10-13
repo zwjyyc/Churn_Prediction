@@ -37,18 +37,22 @@ class FeatureExtractor(object):
         if not self.is_loaded:
             self.load_raw_data()
 
-        self.config_file = src_ + 'configure.in'
-        self.users_train = {}
-        self.users_test = {}
         self.feature_templates = {}
 
-        assert os.path.exists(self.config_file), 'configure.in does not exist'
-        util_yyc.load_configure(self.config_file, self.feature_templates)
+    def extract(self):
+        src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'
+        config_file = src_ + 'configure.in'
+        self.users_train = {}
+        self.users_test = {}
 
-        self.train_feature_dist = src_ + 'dist.train.'
-        self.test_feature_dist = src_ + 'dist.test.'
-        self.build_features(self.train_instances, self.users_train, self.train_feature_dist)
-        self.build_features(self.test_instances, self.users_test, self.test_feature_dist)
+        assert os.path.exists(config_file), 'configure.in does not exist'
+        util_yyc.load_configure(config_file, self.feature_templates)
+
+        train_feature_dist = src_ + 'dist.train.'
+        test_feature_dist = src_ + 'dist.test.'
+        data1 = self.build_features(self.train_instances, self.users_train, train_feature_dist)
+        data2 = self.build_features(self.test_instances, self.users_test, test_feature_dist)
+        return data1, data2
 
     def build_features(self, src, features, outfile):
         # fill feature_templates
@@ -115,9 +119,8 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
-		
-		if cnt >= 10000:
-		    break
+                if cnt >= 10000:
+                    break
 
                 if not line:
                     continue
@@ -197,14 +200,14 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['TotalSecs'].value_2_features(values, dates)
                     features[user_id].extend(feature)
-        
-	labels = [v[0] for k, v in features.iteritems()]
-	scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])      
-	scaled_features = preprocessing.scale(scaled_features)
+
+        labels = [v[0] for k, v in features.iteritems()]
+        scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
+        scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
         file_name = outfile + 'scaledfeature'
         util_yyc.features_2_file(labels, scaled_features, file_name)
-        # build categorical features
+        return labels, scaled_features
 
     def load_raw_data(self):
         progress_print = 'Begin to solve %s' % self.train_csv
@@ -250,6 +253,5 @@ class FeatureExtractor(object):
         else:
             print 'Not found!'
 
-src_dir = sys.argv[1]
-feature_extractor = FeatureExtractor(src_dir)
+
 
