@@ -5,13 +5,13 @@ Name=Gender,InputType=Categorical,OutputType=Categorical
 
 Name=RegisteredVia,InputType=Categorical,OutputType=Categorical
 
-Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=Num50,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=Num75,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=Num985,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=Num100,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=NumUnq,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
-Name=TotalSecs,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12
+Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=Num50,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=Num75,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=Num985,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=Num100,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=NumUnq,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
+Name=TotalSecs,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20160101,UpperTimeBoundary=20170401
 
 Name=NumLogs,InputType=Numerical,OutputType=Numerical
 Name=NumTrans,InputType=Numerical,OutputType=Numerical

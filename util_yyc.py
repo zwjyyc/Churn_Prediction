@@ -266,6 +266,16 @@ def load_configure(src, templates):
                         boundary[0] = float(value)
                     elif key == 'UpperBoundary':
                         boundary[1] = float(value)
+                    elif key == 'LowerTimeBoundary':
+                        year = int(value[:4])
+                        mon = int(value[4:6])
+                        day = int(value[6:8])
+                        time_boundary[0] = datetime.date(year, mon, day)
+                    elif key == 'UpperTimeBoundary':
+                        year = int(value[:4])
+                        mon = int(value[4:6])
+                        day = int(value[6:8])
+                        time_boundary[1] = datetime.date(year, mon, day)
                     elif key == 'TimeInternal':
                         time_internal = [int(item) for item in value.split('&')]
                     elif key == 'Internal':
