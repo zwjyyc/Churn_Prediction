@@ -102,15 +102,15 @@ class FeatureTemplate(object):
                 cnt += num
             self.dim = cnt
 
-        feature = [] * self.dim
+        feature = [0] * self.dim
         for num in self.time_internal:
             start = 0
             for value, date in zip(values, dates):
                 if (date - self.time_boundary[0]).days < 0 or \
                                 (date - self.time_boundary[1]).days > 0:
                     continue
-                ind = (date - self.time_boundary[0]).days * num / self.days_gap
-                feature[start + ind] += value
+                ind = (date - self.time_boundary[0]).days * num  / self.days_gap
+                feature[start + ind] += value * 1.0
             start += num
 
         return feature

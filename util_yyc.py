@@ -379,13 +379,11 @@ def dict_dict_2_file(dic1, dic2, src):
             fout.write(out_str + '\n')
 
 
-def features_2_file(features, file):
+def features_2_file(labels, features, file):
     with open(file, 'w') as fout:
-        for k, v in features.iteritems():
-            out_str = k + '@#@' + v[0]
+        for label, feature in zip(labels, features):
+            out_str = str(label) + '\t'
 
-            for ind, val in enumerate(v):
-                if ind == 0:
-                    continue
-                out_str += ' %d:%f' % (ind, val)
-            fout.write(out_str + '\n')
+            for ind, val in enumerate(feature):
+                out_str += '%d:%f ' % (ind, val)
+            fout.write(out_str.strip() + '\n')

@@ -1,5 +1,8 @@
+from sklearn import preprocessing
+
 import os
 import sys
+import numpy
 import datetime
 
 import base_yyc
@@ -112,6 +115,9 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
+		
+		if cnt >= 10000:
+		    break
 
                 if not line:
                     continue
@@ -128,7 +134,6 @@ class FeatureExtractor(object):
 
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
 
-                feature_set = ['Num25', 'Num50', 'Num75', 'Num985', 'Num100', 'NumUnq', 'TotalSecs']
                 if 'Num25' in self.feature_templates:
                     values = []
                     dates = []
@@ -137,7 +142,7 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num25'].value_2_features(values, dates)
                     #judge dimension
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'Num50' in self.feature_templates:
                     values = []
@@ -146,7 +151,7 @@ class FeatureExtractor(object):
                         values = [log.num_50 for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num50'].value_2_features(values, dates)
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'Num75' in self.feature_templates:
                     values = []
@@ -155,7 +160,7 @@ class FeatureExtractor(object):
                         values = [log.num_75 for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num75'].value_2_features(values, dates)
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'Num985' in self.feature_templates:
                     values = []
@@ -164,7 +169,7 @@ class FeatureExtractor(object):
                         values = [log.num_985 for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num985'].value_2_features(values, dates)
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'Num100' in self.feature_templates:
                     values = []
@@ -173,7 +178,7 @@ class FeatureExtractor(object):
                         values = [log.num_100 for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num100'].value_2_features(values, dates)
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'NumUnq' in self.feature_templates:
                     values = []
@@ -182,7 +187,7 @@ class FeatureExtractor(object):
                         values = [log.num_unq for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['NumUnq'].value_2_features(values, dates)
-                    features[user_id].append(feature)
+                    features[user_id].extend(feature)
 
                 if 'TotalSecs' in self.feature_templates:
                     values = []
@@ -191,11 +196,14 @@ class FeatureExtractor(object):
                         values = [log.total_secs for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['TotalSecs'].value_2_features(values, dates)
-                    features[user_id].append(feature)
-                    
+                    features[user_id].extend(feature)
+        
+	labels = [v[0] for k, v in features.iteritems()]
+	scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])      
+	scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
-        file_name = outfile + 'rawfeature'
-        util_yyc.features_2_file(features, file_name)
+        file_name = outfile + 'scaledfeature'
+        util_yyc.features_2_file(labels, scaled_features, file_name)
         # build categorical features
 
     def load_raw_data(self):
