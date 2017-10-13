@@ -93,13 +93,6 @@ class FeatureExtractor(object):
                 if 'NumLogs' in self.feature_templates and logs:
                     self.feature_templates['NumLogs'].add_value(len(logs), label)
 
-                logs_ = util_yyc.strings_2_logs(logs, user_instance.user_id)
-                if 'Num25' in self.feature_templates and logs:
-                    self.feature_templates['Num25'].add_value([log_.num25 for log_ in logs_],
-                                                              [log_.date for log_ in logs_], label)
-
-
-
                 transactions = user_instance.transactions
                 if 'NumTrans' in self.feature_templates and transactions:
                     self.feature_templates['NumTrans'].add_value(len(transactions), label)
@@ -110,10 +103,48 @@ class FeatureExtractor(object):
                 continue
             file_name = outfile + name
             util_yyc.dict_dict_2_file(feature_template.value_dist, feature_template.label_dist, file_name)
-        # build categorical features
-
 
         # build numerical features
+        with open(src, 'r') as fin:
+            cnt = 0
+            for line in fin:
+                cnt += 1
+                if cnt % print_per_block == 0:
+                    sys.stdout.write('%d\r' % cnt)
+                    sys.stdout.flush()
+
+                if not line:
+                    continue
+                user_instance = util_yyc.string_2_instance(line.strip('\n'))
+                if not user_instance:
+                    continue
+
+                user_id = user_instance.user_id
+                label = user_instance.is_churn
+                member_info = util_yyc.string_2_member(user_instance.member_info, user_instance.user_id)
+
+                if user_id not in features:
+                    features[user_id] = [label]
+
+                logs = util_yyc.strings_2_logs(user_instance.logs)
+
+                feature_set = ['Num25', 'Num50', 'Num75', 'Num985', 'Num100', 'NumUnq', 'TotalSecs']
+                for feature_name in feature_set:
+                    if feature_name in self.feature_templates:
+                        values = []
+                        dates = []
+                        if logs:
+                            values = [log.num25 for log in logs]
+                            dates = [log.date for log in logs]
+                        feature = self.feature_templates['Num25'].value_2_feature(values, dates)
+                        #judge dimension
+                        # assert self.feature_templates['Num25'].feature_dim == len(feature)
+                        features[user_id].append(feature)
+
+        print 'Begin to write features to file'
+        file_name = outfile + 'rawfeature'
+        util_yyc.features_2_file(features, file_name)
+        # build categorical features
 
     def load_raw_data(self):
         progress_print = 'Begin to solve %s' % self.train_csv

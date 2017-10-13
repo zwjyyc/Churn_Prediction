@@ -83,16 +83,38 @@ class FeatureTemplate(object):
         if not self.time_boundary_given:
             self.time_boundary = [datetime.date(2900, 1, 1), datetime.date(1900, 1, 1)]
 
+        self.days_gap = (self.time_boundary[1] - self.time_boundary[2]).days
         self.internal = internal
         self.time_internal = time_internal
 
         self.id_map = {}
-        self.value_dist = {}
+        self.value_dist = {}  # value_dist and label_dist could be merged.
         self.label_dist = {}
         self.dim = -1
 
-    def add_value(self, logs, dates):
-        return
+    def value_2_feature(self, values, dates):
+        if not self.internal:
+            self.internal = [1]
+
+        if self.dim < 0:
+            cnt = 0
+            for num in self.time_internal:
+                cnt += num
+
+        self.dim = cnt
+
+        feature = [] * self.dim
+        for num in self.time_internal:
+            start = 0
+            for value, date in zip(values, dates):
+                if (date - self.time_boundary[0]).days < 0 or \
+                                (date - self.time_boundary[1]).days > 0:
+                    continue
+                ind = (date - self.time_boundary[0]).days * num / self.days_gap
+                feature[start + ind] += value
+            start += num
+
+        return feature
 
     def add_value(self, value, label):
         if value not in self.value_dist:

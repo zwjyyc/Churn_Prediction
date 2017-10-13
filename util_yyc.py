@@ -286,6 +286,13 @@ def load_configure(src, templates):
                                                                time_internal)
 
 
+def configure_2_string(templates):
+    out_str = ''
+    for template in templates:
+        out_str = template
+    return out_str
+
+
 def string_2_member(line, user_id):
     if not line:
         return None
@@ -369,4 +376,16 @@ def dict_dict_2_file(dic1, dic2, src):
 		cnt = label_dist[0] + label_dist[1]
 		c_cnt = label_dist[1]
 		out_str += '@#@' + str(c_cnt * 1.0 / cnt)
+            fout.write(out_str + '\n')
+
+
+def features_2_file(features, file):
+    with open(file, 'w') as fout:
+        for k, v in features.iteritems():
+            out_str = k + '@#@' + v[0]
+
+            for ind, val in enumerate(v):
+                if ind == 0:
+                    continue
+                out_str += ' %d:%f' % (ind, val)
             fout.write(out_str + '\n')
