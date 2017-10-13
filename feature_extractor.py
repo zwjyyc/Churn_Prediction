@@ -93,7 +93,12 @@ class FeatureExtractor(object):
                 if 'NumLogs' in self.feature_templates and logs:
                     self.feature_templates['NumLogs'].add_value(len(logs), label)
 
-                
+                logs_ = util_yyc.strings_2_logs(logs, user_instance.user_id)
+                if 'Num25' in self.feature_templates and logs:
+                    self.feature_templates['Num25'].add_value([log_.num25 for log_ in logs_],
+                                                              [log_.date for log_ in logs_], label)
+
+
 
                 transactions = user_instance.transactions
                 if 'NumTrans' in self.feature_templates and transactions:

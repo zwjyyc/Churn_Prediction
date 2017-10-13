@@ -320,6 +320,36 @@ def string_2_member(line, user_id):
         return member
 
 
+def strings_2_logs(lines, user_id):
+    logs = []
+    for line in lines:
+        if not line:
+            continue
+
+        items = line.split(',')
+        date = datetime.date(2017, 10, 3)
+
+        if len(items[1]) != 8:
+            err_print = 'wrong input %s' % line
+            print err_print
+        else:
+            year = int(items[1][:4])
+            mon = int(items[1][4:6])
+            day = int(items[1][6:8])
+            date = datetime.date(year, mon, day)
+
+            num_25 = int(items[2])
+            num_50 = int(items[3])
+            num_75 = int(items[4])
+            num_985 = int(items[5])
+            num_100 = int(items[6])
+            num_unq = int(items[7])
+            total_secs = float(items[8])
+            logs.append(base_yyc.LogInstance(user_id, date, num_25, num_50, num_75, num_985,
+                                             num_100, num_unq, total_secs))
+    return logs
+
+
 def dict_2_file(dic, src):
     with open(src, 'w') as fout:
         for key, value in sorted(dic.items()):

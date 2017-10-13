@@ -91,6 +91,9 @@ class FeatureTemplate(object):
         self.label_dist = {}
         self.dim = -1
 
+    def add_value(self, logs, dates):
+        return
+
     def add_value(self, value, label):
         if value not in self.value_dist:
             self.value_dist[value] = 0
