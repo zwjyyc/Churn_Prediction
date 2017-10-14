@@ -25,7 +25,8 @@ class ChurnLearner(object):
         self.result_file = src + 'results'
 
         self.k_fold = 5
-        self.models = {'xgboost': {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic'}}
+        self.models = {'xgboost': {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic',
+                                   'eval_metric': 'logloss'}}
         self.ensemble = 'Average'
 
         self.load_configure()
