@@ -34,8 +34,8 @@ class FeatureExtractor(object):
         assert os.path.exists(self.user_logs_csv), 'user_logs.csv does not exist'
         assert os.path.exists(self.members_csv), 'members.csv does not exist'
 
-        #if not self.is_loaded:
-        self.load_raw_data()
+        if not self.is_loaded:
+            self.load_raw_data()
 
         self.feature_templates = {}
 
@@ -119,8 +119,6 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
-                #if cnt >= 10000:
-                #    break
 
                 if not line:
                     continue
@@ -248,11 +246,14 @@ class FeatureExtractor(object):
                     features[user_id].extend(feature)
 
         labels = [v[0] for k, v in features.iteritems()]
+        ids = [k for k, v in features.iteritems()]
         scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
         #scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
         file_name = outfile + 'rawfeatures'
         util_yyc.features_2_file(labels, scaled_features, file_name)
+        file_name = outfile + 'ids'
+        util_yyc.ids_2_file(ids, file_name)
         return labels, scaled_features
 
     def load_raw_data(self):

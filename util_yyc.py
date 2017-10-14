@@ -362,3 +362,15 @@ def features_2_file(labels, features, file):
             for ind, val in enumerate(feature):
                 out_str += '%d:%f ' % (ind + 1, val)
             fout.write(out_str.strip() + '\n')
+
+
+def ids_2_file(ids, file):
+    with open(file, 'w') as fout:
+        fout.write('\n'.join(ids))
+
+def generate_results(preds, ids, file):
+    with open(file, 'w') as fout:
+        fout.write('msno,is_churn\n')
+        for pred, id in zip(preds, ids):
+            out_str = '%s,%s\n' % (id, str(pred))
+            fout.write(out_str)
