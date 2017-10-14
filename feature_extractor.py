@@ -34,8 +34,8 @@ class FeatureExtractor(object):
         assert os.path.exists(self.user_logs_csv), 'user_logs.csv does not exist'
         assert os.path.exists(self.members_csv), 'members.csv does not exist'
 
-        if not self.is_loaded:
-            self.load_raw_data()
+        #if not self.is_loaded:
+        self.load_raw_data()
 
         self.feature_templates = {}
 
@@ -76,23 +76,23 @@ class FeatureExtractor(object):
                 label = user_instance.is_churn
                 member_info = util_yyc.string_2_member(member_info, user_instance.user_id)
 
-                if 'Age' in self.feature_templates:
+                if 'Age' in self.feature_templates and member_info:
                     age = member_info.age
                     self.feature_templates['Age'].add_value(age, label)
 
-                if 'City' in self.feature_templates:
+                if 'City' in self.feature_templates and member_info:
                     city = member_info.city
                     self.feature_templates['City'].add_value(city, label)
 
-                if 'Gender' in self.feature_templates:
+                if 'Gender' in self.feature_templates and member_info:
                     gender = member_info.gender
                     self.feature_templates['Gender'].add_value(gender, label)
 
-                if 'RegisteredDays' in self.feature_templates:
+                if 'RegisteredDays' in self.feature_templates and member_info:
                     registered_days = member_info.registered_days
                     self.feature_templates['RegisteredDays'].add_value(registered_days, label)
 
-                if 'RegisteredVia' in self.feature_templates:
+                if 'RegisteredVia' in self.feature_templates and member_info:
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via, label)
 
@@ -119,8 +119,8 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
-                if cnt >= 10000:
-                    break
+                #if cnt >= 10000:
+                #    break
 
                 if not line:
                     continue
@@ -136,27 +136,37 @@ class FeatureExtractor(object):
                     features[user_id] = [label]
 
                 if 'Age' in self.feature_templates:
-                    value = member_info.age
+                    value = None
+                    if member_info:
+                        value = member_info.age
                     feature = self.feature_templates['Age'].value_2_feature(value)
                     features[user_id].extend(feature)
 
                 if 'RegisteredDays' in self.feature_templates:
-                    value = member_info.registered_days
+                    value = None
+                    if member_info:
+                        value = member_info.registered_days
                     feature = self.feature_templates['RegisteredDays'].value_2_feature(value)
                     features[user_id].extend(feature)
 
                 if 'City' in self.feature_templates:
-                    value = member_info.city
+                    value = None
+                    if member_info:
+                        value = member_info.city
                     feature = self.feature_templates['City'].value_2_feature(value)
                     features[user_id].extend(feature)
 
                 if 'Gender' in self.feature_templates:
-                    value = member_info.gender
+                    value = None
+                    if member_info:
+                        value = member_info.gender
                     feature = self.feature_templates['Gender'].value_2_feature(value)
                     features[user_id].extend(feature)
 
                 if 'RegisteredVia' in self.feature_templates:
-                    value = member_info.registered_via
+                    value = None
+                    if member_info:
+                        value = member_info.registered_via
                     feature = self.feature_templates['RegisteredVia'].value_2_feature(value)
                     features[user_id].extend(feature)
 

@@ -5,7 +5,7 @@ class UserInstance(object):
     def __init__(self, user_id, is_churn):
         self.user_id = user_id  # string
         self.is_churn = is_churn  # 0, 1
-        self.member_info = None
+        self.member_info = ''
         self.logs = []
         self.transactions = []
 
@@ -75,8 +75,6 @@ class FeatureTemplate(object):
 
         self.boundary = boundary
         self.boundary_given = len(boundary) > 0
-        if not self.boundary_given:
-            self.boundary = [float('inf'), -float('inf')]
 
         self.time_boundary = time_boundary
         self.boundary_given = len(time_boundary) > 0
@@ -103,8 +101,8 @@ class FeatureTemplate(object):
             self.dim = cnt
 
         feature = [0] * self.dim
+        start = 0
         for num in self.time_internal:
-            start = 0
             for value, date in zip(values, dates):
                 if (date - self.time_boundary[0]).days < 0 or \
                                 (date - self.time_boundary[1]).days > 0:
@@ -123,13 +121,12 @@ class FeatureTemplate(object):
                 id_size = len(self.id_map) + 1
                 self.id_map[value] = id_size
 
-            if self.input_type == FeatureType.Numerical and not self.boundary_given:
+            if self.input_type == FeatureType.Numerical:
                 if self.boundary[0] > value:
                     self.boundary[0] = value
 
                 if self.boundary[1] < value:
                     self.boundary[1] = value
-
         self.value_dist[value] += 1
         if label not in self.label_dist[value]:
             self.label_dist[value][label] = 0
@@ -147,27 +144,31 @@ class FeatureTemplate(object):
             else:
                 self.dim = self.internal + 2
                 return self.dim
-
+    
     def value_2_feature(self, value):
         if self.output_type == FeatureType.Numerical:
             if self.dim < 0:
                 self.dim = 1
-
+            feature = [0] * self.dim
+            if not value:
+                return feature
+               
             if value > self.boundary[1]:
-                value = self.boundary[1] + 1
+                feature[0] = self.boundary[1] + 1
 
             if value < self.boundary[0]:
-                value = self.boundary[0] - 1
-
-            return [value]
+                feature[0] = self.boundary[0] - 1
+            return feature
         elif self.output_type == FeatureType.Categorical:
             if self.dim < 0:
                 if self.input_type == FeatureType.Categorical:
                     self.dim = len(self.id_map) + 1
                 else:
                     self.dim = self.internal + 2
-
             feature = [0] * self.dim
+            if not value:
+                return feature
+
             if self.input_type == FeatureType.Numerical:
                 if value < self.boundary[0]:
                     feature[0] = 1
@@ -177,8 +178,8 @@ class FeatureTemplate(object):
                     ind = (value - self.boundary[0]) * self.internal / (self.boundary[1] - self.boundary[0] + 1e-8)
                     feature[int(ind)] = 1
             elif self.input_type == FeatureType.Categorical:
-                feature[self.id_map.get(value, default=0)] = 1
-
+                feature[self.id_map.get(value, 0)] = 1
+            return feature
 
 
 
