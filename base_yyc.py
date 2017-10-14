@@ -150,9 +150,23 @@ class FeatureTemplate(object):
 
     def value_2_feature(self, value):
         if self.output_type == FeatureType.Numerical:
-            normalized_value = (value - self.boundary[0]) / (self.boundary[1] - self.boundary[0] + 1e-8)
-            return [normalized_value]
+            if self.dim < 0:
+                self.dim = 1
+
+            if value > self.boundary[1]:
+                value = self.boundary[1] + 1
+
+            if value < self.boundary[0]:
+                value = self.boundary[0] - 1
+
+            return [value]
         elif self.output_type == FeatureType.Categorical:
+            if self.dim < 0:
+                if self.input_type == FeatureType.Categorical:
+                    self.dim = len(self.id_map) + 1
+                else:
+                    self.dim = self.internal + 2
+
             feature = [0] * self.dim
             if self.input_type == FeatureType.Numerical:
                 if value < self.boundary[0]:

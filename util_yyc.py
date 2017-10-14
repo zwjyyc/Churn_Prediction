@@ -357,6 +357,45 @@ def strings_2_logs(lines, user_id):
     return logs
 
 
+def strings_2_transactions(lines, user_id):
+    transactions = []
+    for line in lines:
+        if not line:
+            continue
+
+        items = line.split(',')
+        date = datetime.date(2017, 10, 3)
+
+        payment_method_id = int(items[0])
+        payment_plan_days = int(items[1])
+        plan_list_price = int(items[2])
+        actual_amount_paid = int(items[3])
+        is_auto_renew = int(items[4])
+
+        transaction_date = datetime.date(2017, 10, 3)
+        membership_expire_date = datetime.date(2017, 10, 3)
+
+        if len(items[5]) != 8 or len(items[6]) != 8:
+            err_print = 'wrong input %s' % line
+            print err_print
+        else:
+            year = int(items[5][:4])
+            mon = int(items[5][4:6])
+            day = int(items[5][6:8])
+            transaction_date = datetime.date(year, mon, day)
+
+            year = int(items[6][:4])
+            mon = int(items[6][4:6])
+            day = int(items[6][6:8])
+            membership_expire_date = datetime.date(year, mon, day)
+
+            is_cancel = int(items[7])
+            transactions.append(base_yyc.TranInstance(user_id, payment_method_id, payment_plan_days, plan_list_price,
+                                                      actual_amount_paid, is_auto_renew, transaction_date,
+                                                      membership_expire_date, is_cancel))
+    return transactions
+
+
 def dict_2_file(dic, src):
     with open(src, 'w') as fout:
         for key, value in sorted(dic.items()):

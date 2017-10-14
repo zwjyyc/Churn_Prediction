@@ -138,8 +138,41 @@ class FeatureExtractor(object):
                 if 'Age' in self.feature_templates:
                     value = member_info.age
                     feature = self.feature_templates['Age'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
+                if 'RegisteredDays' in self.feature_templates:
+                    value = member_info.registered_days
+                    feature = self.feature_templates['RegisteredDays'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
+                if 'City' in self.feature_templates:
+                    value = member_info.city
+                    feature = self.feature_templates['City'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
+                if 'Gender' in self.feature_templates:
+                    value = member_info.gender
+                    feature = self.feature_templates['Gender'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
+                if 'RegisteredVia' in self.feature_templates:
+                    value = member_info.registered_via
+                    feature = self.feature_templates['RegisteredVia'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
+                transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
+                if 'NumTrans' in self.feature_templates:
+                    value = len(transactions)
+                    feature = self.feature_templates['NumTrans'].value_2_feature(value)
+                    features[user_id].extend(feature)
 
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
+
+                if 'NumLogs' in self.feature_templates:
+                    value = len(logs)
+                    feature = self.feature_templates['NumLogs'].value_2_feature(value)
+                    features[user_id].extend(feature)
+
                 if 'Num25' in self.feature_templates:
                     values = []
                     dates = []
@@ -206,9 +239,9 @@ class FeatureExtractor(object):
 
         labels = [v[0] for k, v in features.iteritems()]
         scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
-        scaled_features = preprocessing.scale(scaled_features)
+        #scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
-        file_name = outfile + 'scaledfeature'
+        file_name = outfile + 'rawfeatures'
         util_yyc.features_2_file(labels, scaled_features, file_name)
         return labels, scaled_features
 
