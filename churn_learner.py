@@ -4,7 +4,7 @@ class ChurnLearner(object):
     def __init__(self, data1, date2, configure):
         self.data1 = data1
         self.date2 = date2
-        
+
         self.k_fold = 5
         self.models = {}
         self.ensemble = 'Average'

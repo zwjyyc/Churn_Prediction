@@ -135,8 +135,11 @@ class FeatureExtractor(object):
                 if user_id not in features:
                     features[user_id] = [label]
 
-                logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
+                if 'Age' in self.feature_templates:
+                    value = member_info.age
+                    feature = self.feature_templates['Age'].value_2_feature(value)
 
+                logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
                 if 'Num25' in self.feature_templates:
                     values = []
                     dates = []
