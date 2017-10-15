@@ -13,14 +13,9 @@ class ChurnLearner(object):
         assert os.path.exists(data2_src)
         assert os.path.exists(data2_src_ids)
 
-        ids = ''
-        with open(data2_src_ids, 'r') as fin:
-            ids = fin.readlines()
-            print ids
-
         self.data1 = xgb.DMatrix(data1_src)
         self.date2 = xgb.DMatrix(data2_src)
-        self.data2_ids = ids.strip().split('\n')
+        self.data2_ids = util_yyc.load_ids(data2_src_ids)
 
         self.result_file = src + 'results'
 

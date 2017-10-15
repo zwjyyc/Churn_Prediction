@@ -368,6 +368,15 @@ def ids_2_file(ids, file):
     with open(file, 'w') as fout:
         fout.write('\n'.join(ids))
 
+
+def load_ids(file):
+    ids = []
+    with open(file, 'r') as fin:
+        for line in fin:
+            ids.append(line.strip())
+    return ids
+
+
 def generate_results(preds, ids, file):
     with open(file, 'w') as fout:
         fout.write('msno,is_churn\n')
