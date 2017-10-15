@@ -108,7 +108,8 @@ class FeatureExtractor(object):
                 continue
             file_name = outfile + name
             util_yyc.dict_dict_2_file(feature_template.value_dist, feature_template.label_dist, file_name)
-
+        
+        feature_test = False
         # build numerical features
         with open(src, 'r') as fin:
             cnt = 0
@@ -117,7 +118,7 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
-
+                
                 if not line:
                     continue
                 user_instance = util_yyc.string_2_instance(line.strip('\n'))
@@ -135,10 +136,11 @@ class FeatureExtractor(object):
                     value = None
                     if member_info:
                         value = member_info.age
-                    print value
                     feature = self.feature_templates['Age'].value_2_feature(value)
-                    print feature
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Age'
+                        print feature                 
 
                 if 'RegisteredDays' in self.feature_templates:
                     value = None
@@ -146,6 +148,9 @@ class FeatureExtractor(object):
                         value = member_info.registered_days
                     feature = self.feature_templates['RegisteredDays'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'RegisteredDays'
+                        print feature                    
 
                 if 'City' in self.feature_templates:
                     value = None
@@ -153,6 +158,9 @@ class FeatureExtractor(object):
                         value = member_info.city
                     feature = self.feature_templates['City'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'City'
+                        print feature                    
 
                 if 'Gender' in self.feature_templates:
                     value = None
@@ -160,6 +168,9 @@ class FeatureExtractor(object):
                         value = member_info.gender
                     feature = self.feature_templates['Gender'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Gender'
+                        print feature                    
 
                 if 'RegisteredVia' in self.feature_templates:
                     value = None
@@ -167,12 +178,18 @@ class FeatureExtractor(object):
                         value = member_info.registered_via
                     feature = self.feature_templates['RegisteredVia'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'RegisteredVia'
+                        print feature                    
 
                 transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
                 if 'NumTrans' in self.feature_templates:
                     value = len(transactions)
                     feature = self.feature_templates['NumTrans'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'NumTrans'
+                        print feature                    
 
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
 
@@ -180,6 +197,9 @@ class FeatureExtractor(object):
                     value = len(logs)
                     feature = self.feature_templates['NumLogs'].value_2_feature(value)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'NumLogs'
+                        print feature
 
                 if 'Num25' in self.feature_templates:
                     values = []
@@ -188,8 +208,10 @@ class FeatureExtractor(object):
                         values = [log.num_25 for log in logs]
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num25'].value_2_features(values, dates)
-                    #judge dimension
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Num25'
+                        print feature                       
 
                 if 'Num50' in self.feature_templates:
                     values = []
@@ -199,6 +221,9 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num50'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Num50'
+                        print feature
 
                 if 'Num75' in self.feature_templates:
                     values = []
@@ -208,6 +233,9 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num75'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Num75'
+                        print feature
 
                 if 'Num985' in self.feature_templates:
                     values = []
@@ -217,6 +245,9 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num985'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Num985'
+                        print feature
 
                 if 'Num100' in self.feature_templates:
                     values = []
@@ -226,6 +257,9 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['Num100'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'Num100'
+                        print feature
 
                 if 'NumUnq' in self.feature_templates:
                     values = []
@@ -235,6 +269,9 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['NumUnq'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'NumUnq'
+                        print feature
 
                 if 'TotalSecs' in self.feature_templates:
                     values = []
@@ -244,13 +281,18 @@ class FeatureExtractor(object):
                         dates = [log.date for log in logs]
                     feature = self.feature_templates['TotalSecs'].value_2_features(values, dates)
                     features[user_id].extend(feature)
+                    if feature_test:
+                        print 'TotalSecs'
+                        print feature
+
+                feature_test = False                
 
         labels = [v[0] for k, v in features.iteritems()]
         ids = [k for k, v in features.iteritems()]
         scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
         #scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
-        file_name = outfile + 'scaledfeatures'
+        file_name = outfile + 'rawfeatures'
         util_yyc.features_2_file(labels, scaled_features, file_name)
         file_name = outfile + 'ids'
         util_yyc.ids_2_file(ids, file_name)

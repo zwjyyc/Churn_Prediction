@@ -152,7 +152,8 @@ class FeatureTemplate(object):
             feature = [0] * self.dim
             if not value:
                 return feature
-               
+              
+            feature[0] = value
             if value > self.boundary[1]:
                 feature[0] = self.boundary[1] + 1
 
