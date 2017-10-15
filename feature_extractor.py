@@ -42,20 +42,18 @@ class FeatureExtractor(object):
     def extract(self):
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'
         config_file = src_ + 'configure.in'
-        self.users_train = {}
-        self.users_test = {}
-
         assert os.path.exists(config_file), 'configure.in does not exist'
         util_yyc.load_configure(config_file, self.feature_templates)
 
-        train_feature_dist = src_ + 'dist.train.'
-        test_feature_dist = src_ + 'dist.test.'
-        data1 = self.build_features(self.train_instances, self.users_train, train_feature_dist)
-        data2 = self.build_features(self.test_instances, self.users_test, test_feature_dist)
+        features_train_file = src_ + 'dist.train.'
+        features_test_file = src_ + 'dist.test.'
+        data1 = self.build_features(self.train_instances, features_train_file)
+        data2 = self.build_features(self.test_instances,  features_test_file)
         return data1, data2
 
-    def build_features(self, src, features, outfile):
+    def build_features(self, src, outfile):
         # fill feature_templates
+        features = {}
         with open(src, 'r') as fin:
             cnt = 0
             wcnt = 0
@@ -137,7 +135,9 @@ class FeatureExtractor(object):
                     value = None
                     if member_info:
                         value = member_info.age
+                    print value
                     feature = self.feature_templates['Age'].value_2_feature(value)
+                    print feature
                     features[user_id].extend(feature)
 
                 if 'RegisteredDays' in self.feature_templates:
@@ -292,13 +292,6 @@ class FeatureExtractor(object):
         util_yyc.instances_2_file(self.test_instances, self.users_test)
         print '\nDone'
 
-    def unit_test(self, user_id):
-        if user_id in self.users_train:
-            print self.users_train[user_id]
-        elif user_id in self.users_test:
-            print self.users_test[user_id]
-        else:
-            print 'Not found!'
 
 
 
