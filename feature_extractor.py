@@ -250,7 +250,7 @@ class FeatureExtractor(object):
         scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
         #scaled_features = preprocessing.scale(scaled_features)
         print 'Begin to write features to file'
-        file_name = outfile + 'rawfeatures'
+        file_name = outfile + 'scaledfeatures'
         util_yyc.features_2_file(labels, scaled_features, file_name)
         file_name = outfile + 'ids'
         util_yyc.ids_2_file(ids, file_name)

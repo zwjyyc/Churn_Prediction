@@ -14,13 +14,13 @@ class ChurnLearner(object):
         assert os.path.exists(data2_src_ids)
 
         self.data1 = xgb.DMatrix(data1_src)
-        self.date2 = xgb.DMatrix(data2_src)
+        self.data2 = xgb.DMatrix(data2_src)
         self.data2_ids = util_yyc.load_ids(data2_src_ids)
 
         self.result_file = src + 'results'
 
         self.k_fold = 5
-        self.models = {'xgboost': {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic',
+        self.models = {'xgboost': {'max_depth': 3, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic',
                                    'eval_metric': 'logloss'}}
         self.ensemble = 'Average'
 
@@ -32,13 +32,13 @@ class ChurnLearner(object):
     def learn(self):
         if 'xgboost' in self.models:
             params = self.models['xgboost']
-            num_round = 10
-            xgb.cv(params, self.data1, num_round, nfold=5, seed=0)
+            num_round = 30
+            print xgb.cv(params, self.data1, num_round, nfold=5, seed=0)
 
             bst = xgb.train(params, self.data1, num_round)
             preds = bst.predict(self.data2)
-            assert len(preds) == len(self.ids)
-            util_yyc.generate_results(preds, self.ids, self.result_file)
+            assert len(preds) == len(self.data2_ids)
+            util_yyc.generate_results(preds, self.data2_ids, self.result_file)
 
 
     def predict(self):
