@@ -1,6 +1,7 @@
 import base_yyc
 
 import datetime
+import pickle
 import sys
 
 print_per_block = 1e6
@@ -301,11 +302,11 @@ def strings_2_transactions(lines, user_id):
         items = line.split(',')
         date = datetime.date(2017, 10, 3)
 
-        payment_method_id = int(items[0])
+        payment_method_id = items[0]
         payment_plan_days = int(items[1])
         plan_list_price = int(items[2])
         actual_amount_paid = int(items[3])
-        is_auto_renew = int(items[4])
+        is_auto_renew = items[4]
 
         transaction_date = datetime.date(2017, 10, 3)
         membership_expire_date = datetime.date(2017, 10, 3)
@@ -381,5 +382,24 @@ def generate_results(preds, ids, file):
     with open(file, 'w') as fout:
         fout.write('msno,is_churn\n')
         for pred, id in zip(preds, ids):
-            out_str = '%s,%s\n' % (id, str(pred))
+            out_str = '%s,%.7f\n' % (id, pred)
             fout.write(out_str)
+
+def save_feature_ind(inds, src):
+    with open(src, 'wb') as fout:
+        pickle.dump(inds, fout, protocol=pickle.HIGHEST_PROTOCOL)
+
+def load_feature_ind(src):
+    with open(src, 'rb') as fin:
+        return  pickle.load(fin)
+
+def svminput_2_list(src):
+    features = []
+    labels = []
+    with open(src, 'r') as fin:
+        for line in fin:
+            items = line.strip().split('\t')
+            labels.append(int(items[0]))
+            features.append([ float(item.split(':')[1]) for item in items[1].split()])
+
+    return features, labels
