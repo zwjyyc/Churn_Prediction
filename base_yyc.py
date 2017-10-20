@@ -31,6 +31,12 @@ class TranInstance(object):
         self.transaction_date = transaction_date
         self.membership_expire_date = membership_expire_date
         self.is_cancel = is_cancel
+        self.is_ok = True
+
+        if is_cancel == 0 or payment_plan_days != \
+                (membership_expire_date - transaction_date).days:  # remove illegal transaction
+            self.is_ok = False
+            print 'found wrong transaction!'
 
 
 class LogInstance(object):
@@ -79,9 +85,8 @@ class FeatureTemplate(object):
         self.time_boundary = time_boundary
         self.boundary_given = len(time_boundary) > 0
         if not self.boundary_given:
-            self.time_boundary = [datetime.date(2018,1,1), datetime.date(1990,1,1)]
+            self.time_boundary = [datetime.date(2018, 1, 1), datetime.date(1990, 1, 1)]
 
-        self.days_gap = (self.time_boundary[1] - self.time_boundary[0]).days
         self.internal = internal
         self.time_internal = time_internal
 
@@ -90,65 +95,7 @@ class FeatureTemplate(object):
         self.label_dist = {}
         self.dim = -1
         self.method_map = {'24': 12, '25': 23, '26': 21, '27': 15, '20': 24, '21': 3, '22': 20, '23': 9, '28': 19, '29': 18, '40': 5, '41': 1, '1': 40, '3': 37, '2': 38, '5': 26, '4': 39, '7': 29, '6': 36, '8': 35, '13': 30, '12': 31, '11': 28, '10': 33, '39': 2, '38': 10, '15': 34, '14': 13, '17': 25, '16': 32, '33': 7, '32': 22, '31': 8, '30': 17, '37': 4, '36': 14, '35': 16, '34': 6, '19': 11, '18': 27}
-        self.renew_map = {'1': 1, '0': 2}    
-        self.estart = 0
-    
-    def last_time_feature(self, values, dates, is_train):
-        last_date = datetime.date(2016, 1, 1)
-        time_point_start = self.time_boundary[0]
-        time_point_end = self.time_boundary[1]
-        
-        if is_train:
-                time_point_start -= datetime.timedelta(30)
-                time_point_end -= datetime.timedelta(30)        
-
-        num_date = 0
-        for value, date in zip(values, dates):
-            if (date - time_point_start).days < 0 or \
-                                (date - time_point_end).days > 0:
-                continue
-            num_date += 1
-            if (date - last_date).days > 0:
-                last_date = date
-        
-        return [num_date, (time_point_end - last_date).days] 
-    
-    def value_2_features(self, values, dates, is_train):
-        if not self.internal:
-            self.internal = [1]
-        time_point_start = self.time_boundary[0]
-        time_point_end = self.time_boundary[1]
-        days_gap = self.days_gap
-
-        if self.dim < 0:
-            cnt = 0
-            for num in self.time_internal:
-                cnt += num
-            self.dim = cnt
-            if is_train:
-                time_point_start -= datetime.timedelta(30)
-                time_point_end -= datetime.timedelta(30)
-        
-        num_date = 0
-        for value, date in zip(values, dates):
-            if (date - time_point_start).days < 0 or \
-                    (date - time_point_end).days > 0:
-                continue
-            num_date += 1
-
-        feature = [0] * self.dim
-
-        start = 0
-        for num in self.time_internal:
-            for value, date in zip(values, dates):
-                if (date - time_point_start).days < 0 or \
-                                (date - time_point_end).days > 0:
-                    continue
-                ind = (date - time_point_start).days * num  / (days_gap + 1)
-                feature[start + ind] += value * 1.0 / num_date
-            start += num
-
-        return feature
+        self.renew_map = {'1': 1, '0': 2}
 
     def add_value(self, value, label):
         if value not in self.value_dist:
@@ -158,188 +105,192 @@ class FeatureTemplate(object):
                 id_size = len(self.id_map) + 1
                 self.id_map[value] = id_size
 
-            if self.input_type == FeatureType.Numerical:
-                if self.boundary[0] > value:
-                    self.boundary[0] = value
-
-                if self.boundary[1] < value:
-                    self.boundary[1] = value
         self.value_dist[value] += 1
         if label not in self.label_dist[value]:
             self.label_dist[value][label] = 0
 
         self.label_dist[value][label] += 1
 
-    def get_dim(self):
-        if self.output_type == FeatureType.Numerical:
-            self.dim = 1
-            return 1
-        else:
-            if self.input_type == FeatureType.Categorical:
-                self.dim = len(self.value_dist) + 1
-                return self.dim
-            else:
-                self.dim = self.internal + 2
-                return self.dim
-    
-    def value_2_onedim(self, value):
+    def value_2_id(self, value):
         feature = [0]
-        if value and value in self.id_map:
-            feature = [self.id_map[value]]
+        if self.output_type == FeatureType.Categorical:
+            feature = [0] * len(self.id_map)
+
+        if not value:
+            return feature
+        elif self.output_type == FeatureType.Numerical:
+            feature = [self.id_map.get(value, 0)]
+        else:
+            feature[self.id_map.get(value, 0)] = 1
         return feature
-    
-    def value_2_feature(self, value):
-        if self.output_type == FeatureType.Numerical:
-            if self.dim < 0:
-                self.dim = 1
-            feature = [0] * self.dim
-            if not value:
-                return feature
-              
-            feature[0] = value
-            if value > self.boundary[1]:
-                feature[0] = self.boundary[1] + 1
-
-            if value < self.boundary[0]:
-                feature[0] = self.boundary[0] - 1
-            return feature
-        elif self.output_type == FeatureType.Categorical:
-            if self.dim < 0:
-                if self.input_type == FeatureType.Categorical:
-                    self.dim = len(self.id_map) + 1
-                else:
-                    self.dim = self.internal + 2
-            
-            feature = [0] * self.dim
-            if not value:
-                return feature
-            
-            if self.input_type == FeatureType.Numerical:
-                if value < self.boundary[0]:
-                    feature[0] = 1
-                elif value > self.boundary[1]:
-                    feature[self.dim - 1] = 1
-                else:
-                    ind = (value - self.boundary[0]) * self.internal / (self.boundary[1] - self.boundary[0] + 1e-8)
-                    feature[int(ind)] = 1
-            elif self.input_type == FeatureType.Categorical:
-                feature[self.id_map.get(value, 0)] = 1
-            return feature
-
-
 
     def transactions_2_features(self, transactions, is_train):
         time_point_start = self.time_boundary[0]
         time_point_end = self.time_boundary[1]
 
         if self.dim < 0:
-            cnt = 5
+            cnt = 9
             for num in self.time_internal:
                 cnt += num
-            cnt += len(self.method_map) + 1
-            cnt += len(self.renew_map) + 1
-            
-            self.estart = cnt
-            cnt += 4
-            cnt += 1 #len(self.method_map) + 1
-            cnt += 1 #len(self.renew_map) + 1
-            cnt += 2
+            cnt += 2 * (len(self.method_map) + 1)
+            cnt += 2 * (len(self.renew_map) + 1)
             self.dim = cnt
-            
+
             if is_train:
                 time_point_start -= datetime.timedelta(30)
                 time_point_end -= datetime.timedelta(30)
-            
+
         feature = [0] * self.dim
-        last_date = datetime.date(1900,1,1)
-        last_instance = None        
-        
+        ind = 0
         num_trans = 0
         for transaction in transactions:
             date = transaction.transaction_date
+            is_ok = transaction.is_ok
             if (date - time_point_start).days < 0 or \
-                                (date - time_point_end).days > 0:
+                                (date - time_point_end).days > 0 or not is_ok:
                     continue
             num_trans += 1
+        feature[ind] = num_trans
 
-        feature[0] = num_trans
-
+        renew_dist = {}
+        last_date = datetime.date(1900, 1, 1)
+        last_instance = None
         for transaction in transactions:
             date = transaction.transaction_date
+            is_ok = transaction.is_ok
             if (date - time_point_start).days < 0 or \
-                                (date - time_point_end).days > 0:
+                                (date - time_point_end).days > 0 or not is_ok:
                     continue
 
             if (date - last_date).days > 0:
                 last_date = date
                 last_instance = transaction
-            
-            start = 1
+
+            ind = 1
             payment_plan_days = transaction.payment_plan_days
-            feature[start] += payment_plan_days * 1.0 / num_trans
+            feature[ind] += payment_plan_days * 1.0 / num_trans
+            ind += 1
 
-            start += 1
             plan_list_price = transaction.plan_list_price
-            feature[start] += plan_list_price * 1.0 / num_trans
+            feature[ind] += plan_list_price * 1.0 / num_trans
+            ind += 1
 
-            start += 1
-            actual_amount_paid = transaction.actual_amount_paid 
-            feature[start] += actual_amount_paid * 1.0 / num_trans
+            actual_amount_paid = transaction.actual_amount_paid
+            feature[ind] += actual_amount_paid * 1.0 / num_trans
+            ind += 1
 
-            start += 1
-            is_cancel = transaction.is_cancel
-            feature[start] += is_cancel * 1.0 / num_trans
-
-            start += 1
             for num in self.time_internal:
-                ind = (date - self.time_boundary[0]).days * num / (self.days_gap + 1)
-                feature[start + ind] += 1.0 / num_trans
-                start += num
-            
-            payment_method_id = transaction.payment_method_id
-            ind = self.method_map.get(payment_method_id, 0)
-            feature[start + ind] += 1.0 / num_trans
+                ind_ = (date - time_point_start).days * num / (self.days_gap + 1)
+                feature[ind + ind_] += 1
+                ind += num
 
-            start += len(self.method_map) + 1
+            payment_method_id = transaction.payment_method_id
+            ind_ = self.method_map.get(payment_method_id, 0)
+            feature[ind + ind_] += 1.0
+            ind += len(self.method_map) + 1
+
             is_auto_renew = transaction.is_auto_renew
-            ind = self.renew_map.get(is_auto_renew, 0)
-            feature[start + ind] += 1.0 / num_trans            
-     
-        
+            ind_ = self.renew_map.get(is_auto_renew, 0)
+            feature[ind + ind_] += 1.0
+            if ind_ not in renew_dist:
+                renew_dist[ind_] = 0
+            renew_dist[ind_] += 1
+            ind += len(self.method_map) + 1
+
+        # features of last instance
         if not last_instance:
             return feature
-        estart = self.estart
+
         payment_plan_days = last_instance.payment_plan_days
-        feature[estart] = payment_plan_days
+        feature[ind] = payment_plan_days
+        ind += 1
 
-        estart += 1
         plan_list_price = last_instance.plan_list_price
-        feature[estart] = plan_list_price
-        
-        estart += 1
+        feature[ind] = plan_list_price
+        ind += 1
+
         actual_amount_paid = last_instance.actual_amount_paid
-        feature[estart] = actual_amount_paid
+        feature[ind] = actual_amount_paid
+        ind += 1
 
-        estart += 1
-        is_cancel = last_instance.is_cancel
-        feature[estart] = is_cancel
-
-        estart += 1        
         payment_method_id = last_instance.payment_method_id
-        ind = self.method_map.get(payment_method_id, 0)
-        feature[estart] = ind
+        ind_ = self.method_map.get(payment_method_id, 0)
+        feature[ind + ind_] = 1
+        ind += len(self.method_map) + 1
 
-        estart += 1 #len(self.method_map) + 1
         is_auto_renew = last_instance.is_auto_renew
-        ind = self.renew_map.get(is_auto_renew, 0)
-        feature[estart] = ind
+        ind_ = self.renew_map.get(is_auto_renew, 0)
+        feature[ind_] = 1
+        ind += len(self.renew_map) + 1
 
-        estart += 1 #len(self.renew_map) + 1
-        transaction_date = (time_point_end - last_instance.transaction_date).days / 30.0 
-        feature[estart] = transaction_date
+        transaction_date = (time_point_end - last_instance.transaction_date).days / 30.0
+        feature[ind] = transaction_date
+        ind += 1
 
-        estart += 1
-        membership_expire_date = ( time_point_end - last_instance.membership_expire_date).days / 30.0
-        feature[estart] = membership_expire_date
-        
+        ### features of most common payment method and renew
+        sorted_list = sorted(renew_dist.items(), key=lambda (k, v): (v, k), reverse=True)
+        feature[ind] = sorted_list[0][0]
+        ind += 1
         return feature
+
+    def logs_2_features(self, logs, is_train):
+        last_date = datetime.date(2016, 1, 1)
+        time_point_start = self.time_boundary[0]
+        time_point_end = self.time_boundary[1]
+        days_gap = (time_point_end - time_point_start).days
+
+        if self.dim < 0:
+            cnt = 2
+            for num in self.time_internal:
+                cnt += num * 4
+
+            self.dim = cnt
+            if is_train:
+                time_point_start -= datetime.timedelta(30)
+                time_point_end -= datetime.timedelta(30)
+
+        feature = [0] * self.dim
+        if not logs:
+            return feature
+
+        num_logs = 0
+        for log in logs:
+            date = log.date
+            if (date - time_point_start).days < 0 or \
+                            (date - time_point_end).days > 0:
+                continue
+
+            num_logs += 1
+            if (date - last_date).days > 0:
+                last_date = date
+
+        ind = 0
+        feature[ind] = num_logs
+        ind += 1
+
+        feature[ind] = (last_date - time_point_start).days
+        ind += 1
+        for num in self.time_internal:
+            for log in logs:
+                date = log.date
+                if (date - time_point_start).days < 0 or \
+                                (date - time_point_end).days > 0:
+                    continue
+                ind_ = (date - time_point_start).days * num / (days_gap + 1)
+
+                value = log.num_25 if log.num_25 <= 100 else 100
+                feature[ind + ind_] += value * 1.0 / num_logs
+                ind += num
+
+                value = log.num_100 if log.num_100 <= 1000 else 1000
+                feature[ind + ind_] += value * 1.0 / num_logs
+                ind += num
+
+                value = log.total_secs if log.total_secs <= 24 * 60 * 60 else 24 * 60 * 60
+                feature[ind + ind_] += value * 1.0 / num_logs
+                ind += num
+
+                feature[ind + ind_] += 1.0
+                ind += num
+        return feature
+

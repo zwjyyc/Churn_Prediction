@@ -52,9 +52,8 @@ class FeatureExtractor(object):
         is_train = True
         data1 = self.build_features(self.train_instances, features_train_file, is_train=is_train)
         data2 = self.build_features(self.test_instances,  features_test_file)
-        return data1, data2
 
-    def build_features(self, src, outfile, oldfeatures = None, is_train = False):
+    def build_features(self, src, outfile, old_features=None, is_train=False):
         # fill feature_templates
         features = {}
         with open(src, 'r') as fin:
@@ -97,25 +96,23 @@ class FeatureExtractor(object):
                     registered_via = member_info.registered_via
                     self.feature_templates['RegisteredVia'].add_value(registered_via, label)
 
-                logs = user_instance.logs
-                if 'NumLogs' in self.feature_templates and logs:
-                    self.feature_templates['NumLogs'].add_value(len(logs), label)
-
-                transactions = user_instance.transactions
-                if 'NumTrans' in self.feature_templates and transactions:
-                    self.feature_templates['NumTrans'].add_value(len(transactions), label)
-
         print '%d/%d missing!' % (wcnt, cnt)
         for name, feature_template in self.feature_templates.items():
             if len(feature_template.value_dist) == 0:
                 continue
             file_name = outfile + name
             util_yyc.dict_dict_2_file(feature_template.value_dist, feature_template.label_dist, file_name)
-        
-        features_valid = {}
-        feature_test = True
+
+        current_time_point = datetime.date(2017, 4, 1)
+        start_time_point = datetime.date(2016, 1, 1)
+        if is_train:
+            current_time_point -= datetime.timedelta(30)
+            start_time_point -= datetime.timedelta(30)
+
+        print_feature_info = True
         feature_ind = {}
         ind = 0
+
         # build numerical features
         with open(src, 'r') as fin:
             cnt = 0
@@ -124,12 +121,10 @@ class FeatureExtractor(object):
                 if cnt % print_per_block == 0:
                     sys.stdout.write('%d\r' % cnt)
                     sys.stdout.flush()
-                
-                #if cnt % 1000 == 0:
-                #    feature_test = True
 
                 if not line:
                     continue
+
                 user_instance = util_yyc.string_2_instance(line.strip('\n'))
                 if not user_instance:
                     continue
@@ -138,237 +133,127 @@ class FeatureExtractor(object):
                 label = user_instance.is_churn
                 member_info = util_yyc.string_2_member(user_instance.member_info, user_instance.user_id)
                 
-                if oldfeatures and user_id in oldfeatures:
-                    #features_valid[user_id] = oldfeatures[user_id]
-                    #features_valid[user_id][0] = label
-                    features[user_id] = oldfeatures[user_id]
+                if old_features and user_id in old_features:
+                    features[user_id] = old_features[user_id]
                     continue
                 
                 if user_id not in features:
                     features[user_id] = [label]
 
+                if 'HasMemInfo' in self.feature_templates:
+                    feature = [1] if member_info else [0]
+                    features[user_id].extend(feature)
+                    if print_feature_info:
+                        print 'HasMemInfo'
+                        print feature
+                        feature_ind['HasMemInfo'] = [ind, ind + len(feature)]
+                        ind += len(feature)
+
                 if 'Age' in self.feature_templates:
-                    value = None
-                    if member_info:
-                        value = member_info.age
+                    value = member_info.age if member_info else None
                     feature = self.feature_templates['Age'].value_2_feature(value)
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'Age'
                         print feature
                         feature_ind['Age'] = [ind, ind + len(feature)]                      
                         ind += len(feature)
                 
                 if 'ExpirationDate' in self.feature_templates:
-                    value = [0]
-                    if member_info:
-                        value[0] = (member_info.expiration_date - datetime.date(2016,1,1)).days / 30.0
-                        if is_train:
-                            value[0] = (member_info.expiration_date - datetime.date(2015,12,1)).days / 30.0
-                    #print value
-                    feature = value #self.feature_templates['ExpirationDate'].value_2_feature(value)
+                    feature = [(member_info.expiration_date - current_time_point).days / 30.0] if member_info else [0]
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'ExpirationDate'
                         print feature
                         feature_ind['ExpirationDate'] = [ind, ind + len(feature)]
                         ind += len(feature) 
 
                 if 'RegistrationInitTime' in self.feature_templates:
-                    value = [0]
-                    if member_info:
-                        value[0] = (member_info.registration_init_time - datetime.date(2016,1,1)).days / 30.0
-                        if is_train:
-                            value[0] = (member_info.expiration_date - datetime.date(2015,12,1)).days / 30.0
-                    #print value
-                    feature = value #self.feature_templates['RegistrationInitTime'].value_2_feature(value)
+                    feature = [(member_info.registration_init_time - start_time_point).days / 30.0] if member_info else [0]
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'RegistrationInitTime'
                         print feature
                         feature_ind['RegistrationInitTime'] = [ind, ind + len(feature)]
                         ind += len(feature)
 
                 if 'RegisteredDays' in self.feature_templates:
-                    value = None
-                    if member_info:
-                        value = member_info.registered_days / 30.0
-                    feature = self.feature_templates['RegisteredDays'].value_2_feature(value)
+                    feature = [(current_time_point - member_info.registration_init_time) / 30.0] if member_info else [0]
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'RegisteredDays'
                         print feature
                         feature_ind['RegisteredDays'] = [ind, ind + len(feature)]
                         ind += len(feature)                        
 
                 if 'City' in self.feature_templates:
-                    value = None
-                    if member_info:
-                        value = member_info.city
-                    feature = self.feature_templates['City'].value_2_onedim(value)
+                    value = member_info.city if member_info else None
+                    feature = self.feature_templates['City'].value_2_id(value)
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'City'
                         print feature               
                         feature_ind['City'] = [ind, ind + len(feature)]
                         ind += len(feature)     
 
                 if 'Gender' in self.feature_templates:
-                    value = None
-                    if member_info:
-                        value = member_info.gender
-                    feature = self.feature_templates['Gender'].value_2_onedim(value)
+                    value = member_info.gender if member_info else None
+                    feature = self.feature_templates['Gender'].value_2_id(value)
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'Gender'
                         print feature
                         feature_ind['Gender'] = [ind, ind + len(feature)]
                         ind += len(feature)               
 
                 if 'RegisteredVia' in self.feature_templates:
-                    value = None
-                    if member_info:
-                        value = member_info.registered_via
-                    feature = self.feature_templates['RegisteredVia'].value_2_onedim(value)
+                    value = member_info.registered_via if member_info else None
+                    feature = self.feature_templates['RegisteredVia'].value_2_id(value)
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'RegisteredVia'
                         print feature       
                         feature_ind['RegisteredVia'] = [ind, ind + len(feature)]
                         ind += len(feature)             
 
                 transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
-
                 if 'Trans' in self.feature_templates:
-                    values = []
-                    if transactions:
-                        values = transactions
-                    feature = self.feature_templates['Trans'].transactions_2_features(values, is_train)
+                    feature = self.feature_templates['Trans'].transactions_2_features(transactions, is_train)
                     features[user_id].extend(feature)
-                    if feature_test:
+                    if print_feature_info:
                         print 'Trans'
                         print feature
                         feature_ind['Trans'] = [ind, ind + len(feature)]
                         ind += len(feature)
-                    
 
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
-
-                if 'Num25' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_25 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['Num25'].last_time_feature(values, dates, is_train)
-                    feature.extend(self.feature_templates['Num25'].value_2_features(values, dates, is_train))
+                if 'HasLogInfo' in self.feature_templates:
+                    feature = [1] if logs else [0]
                     features[user_id].extend(feature)
-                    if feature_test:
-                        print 'Num25'
-                        print feature        
-                        feature_ind['Num25'] = [ind, ind + len(feature)]
-                        ind += len(feature)               
-
-                if 'Num50' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_50 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['Num50'].value_2_features(values, dates, is_train)
-                    features[user_id].extend(feature)
-                    if feature_test:
-                        print 'Num50'
+                    if print_feature_info:
+                        print 'HasLogInfo'
                         print feature
-                        feature_ind['Num50'] = [ind, ind + len(feature)]
+                        feature_ind['HasLogInfo'] = [ind, ind + len(feature)]
                         ind += len(feature)
 
-                if 'Num75' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_75 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['Num75'].value_2_features(values, dates, is_train)
+                if 'Logs' in self.feature_templates:
+                    feature = self.feature_templates['Logs'].logs_2_features(logs, is_train)
                     features[user_id].extend(feature)
-                    if feature_test:
-                        print 'Num75'
+                    if print_feature_info:
+                        print 'Logs'
                         print feature
-                        feature_ind['Num75'] = [ind, ind + len(feature)]
+                        feature_ind['Logs'] = [ind, ind + len(feature)]
                         ind += len(feature)
-
-                if 'Num985' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_985 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['Num985'].value_2_features(values, dates, is_train)
-                    features[user_id].extend(feature)
-                    if feature_test:
-                        print 'Num985'
-                        print feature
-                        feature_ind['Num985'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
-                if 'Num100' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_100 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['Num100'].value_2_features(values, dates, is_train)
-                    features[user_id].extend(feature)
-                    if feature_test:
-                        print 'Num100'
-                        print feature
-                        feature_ind['Num100'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
-                if 'NumUnq' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.num_unq for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['NumUnq'].value_2_features(values, dates, is_train)
-                    features[user_id].extend(feature)
-                    if feature_test:
-                        print 'NumUnq'
-                        print feature
-                        feature_ind['NumUnq'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
-                if 'TotalSecs' in self.feature_templates:
-                    values = []
-                    dates = []
-                    if logs:
-                        values = [log.total_secs / 60.0 for log in logs]
-                        dates = [log.date for log in logs]
-                    feature = self.feature_templates['TotalSecs'].value_2_features(values, dates, is_train)
-                    features[user_id].extend(feature)
-                    if feature_test:
-                        print 'TotalSecs'
-                        print feature
-                        feature_ind['TotalSecs'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
-                feature_test = False                
+                print_feature_info = False                
 
         labels = [v[0] for k, v in features.iteritems()]
         ids = [k for k, v in features.iteritems()]
         scaled_features = numpy.array([v[1:] for k, v in features.iteritems()])
         #scaled_features = preprocessing.scale(scaled_features)
+
         print 'Begin to write features to file'
-        
         file_name = outfile + 'rawfeatures'
         util_yyc.features_2_file(labels, scaled_features, file_name)
-        
-        if len(features_valid) != 0:
-            labels_valid = [v[0] for k, v in features_valid.iteritems()]
-            scaled_features_valid = numpy.array([v[1:] for k, v in features_valid.iteritems()])
-            file_name = outfile + 'filteredvalidfeatures'    
-            util_yyc.features_2_file(labels_valid, scaled_features_valid, file_name)    
 
         file_name = outfile + 'ids'
         util_yyc.ids_2_file(ids, file_name)

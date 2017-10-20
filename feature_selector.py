@@ -4,14 +4,17 @@ import shutil
 import util_yyc
 
 class FeatureSelector(object):
-    def __init__(self, src, use_all = True):
+    def __init__(self, src, use_all=True):
         self.src = src
         self.data1_src = src + 'dist.train.rawfeatures'
         self.data2_src = src + 'dist.test.rawfeatures'
-        #self.data3_src = src + 'dist.train.filteredvalidfeatures'
-        self.feature_set = ['Age', 'RegisteredDays', 'City', 'Gender', 'RegisteredVia', \
-                            'Trans', 'ExpirationDate', 'TotalSecs', 'NumUnq', 'Num25', 'Num50', 'Num75', \
+
+        self.train_ratio = 0.2
+
+        self.feature_set = ['Age', 'RegisteredDays', 'City', 'Gender', 'RegisteredVia',\
+                            'Trans', 'ExpirationDate', 'TotalSecs', 'NumUnq', 'Num25', 'Num50', 'Num75',\
                             'Num985', 'Num100', 'RegistrationInitTime', 'ExpirationDate']
+
         feature_ind_src = src + 'dist.train.featureind'
         
         self.use_all = use_all
@@ -55,29 +58,18 @@ class FeatureSelector(object):
                 #out_str = label + '\t' + ' '.join(iitems)
                 #fout.write(out_str + '\n')
                 fout.write(line)
+
         data2_out = self.src + 'dist.test.features'
         with open(data2_out, 'w') as fout, open(self.data2_src, 'r') as fin:
             for line in fin:
-                #items = line.strip().split('\t')
-                #label = items[0]
-                #features = items[1].split()
+                items = line.strip().split('\t')
+                label = items[0]
+                features = items[1].split()
 
-                #iitems = []
-                #for k, v in tmp_dic:
-                #    iitems.extend(features[k:v])
-                #out_str = label + '\t' + ' '.join(iitems)
-                #fout.write(out_str + '\n')
+                iitems = []
+                for k, v in tmp_dic:
+                    iitems.extend(features[k:v])
+                out_str = label + '\t' + ' '.join(iitems)
+                fout.write(out_str + '\n')
                 fout.write(line)
-        #data3_out = self.src + 'dist.valid.features'
-        #with open(data3_out, 'w') as fout, open(self.data3_src, 'r') as fin:
-        #    for line in fin:
-        #        items = line.strip().split('\t')
-        #        label = items[0]
-        #        features = items[1].split()
-
-        #        iitems = []
-        #        for k, v in tmp_dic:
-        #            iitems.extend(features[k:v])
-        #        out_str = label + '\t' + ' '.join(iitems)
-        #        fout.write(out_str + '\n')
 

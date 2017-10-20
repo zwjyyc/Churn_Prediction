@@ -385,13 +385,16 @@ def generate_results(preds, ids, file):
             out_str = '%s,%.7f\n' % (id, pred)
             fout.write(out_str)
 
+
 def save_feature_ind(inds, src):
     with open(src, 'wb') as fout:
         pickle.dump(inds, fout, protocol=pickle.HIGHEST_PROTOCOL)
 
+
 def load_feature_ind(src):
     with open(src, 'rb') as fin:
         return  pickle.load(fin)
+
 
 def svminput_2_list(src):
     features = []

@@ -6,15 +6,20 @@ Name=ExpirationDate,InputType=Numerical,OutputType=Numerical
 Name=RegistrationInitTime,InputType=Numerical,OutputType=Numerical
 Name=RegisteredVia,InputType=Categorical,OutputType=Categorical
 
-Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=Num50,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=Num75,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=Num985,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=Num100,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=NumUnq,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
-Name=TotalSecs,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=Num25,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=Num50,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=Num75,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=Num985,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=Num100,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=NumUnq,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+#Name=TotalSecs,InputType=Numerical,OutputType=Numerical,TimeInternal=1&2&4&12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
 
-Name=NumLogs,InputType=Numerical,OutputType=Numerical
-Name=NumTrans,InputType=Numerical,OutputType=Numerical
+Name=Logs,InputType=Numerical,OutputType=Numerical,TimeInternal=12,LowerTimeBoundary=20170101,UpperTimeBoundary=20170228
+
+#Name=NumLogs,InputType=Numerical,OutputType=Numerical
+#Name=NumTrans,InputType=Numerical,OutputType=Numerical
+
+Name=HasLogInfo,InputType=Numerical,OutputType=Numerical
+Name=HasMemInfo,InputType=Numerical,OutputType=Numerical
 
 Name=Trans,InputType=Numerical,OutputType=Numerical,LowerTimeBoundary=20160101,UpperTimeBoundary=20170228,TimeInternal=2&4&6

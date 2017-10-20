@@ -3,9 +3,9 @@ import feature_extractor
 import feature_selector
 import churn_learner
 
-#src_dir = sys.argv[1]
-#extractor = feature_extractor.FeatureExtractor(src_dir)
-#extractor.extract()
+src_dir = sys.argv[1]
+extractor = feature_extractor.FeatureExtractor(src_dir)
+extractor.extract()
 
 src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'
 
