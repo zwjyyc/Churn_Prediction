@@ -49,7 +49,7 @@ class FeatureSelector(object):
                 #    continue
                 items = line.strip().split('\t')
                 label = items[0]
-                if label == '0' and cnt % 5 != 0:
+                if label == '0' and cnt % 3 != 1:
                     continue
                 #features = items[1].split()
                 #iitems = []
@@ -62,14 +62,14 @@ class FeatureSelector(object):
         data2_out = self.src + 'dist.test.features'
         with open(data2_out, 'w') as fout, open(self.data2_src, 'r') as fin:
             for line in fin:
-                items = line.strip().split('\t')
-                label = items[0]
-                features = items[1].split()
+                #items = line.strip().split('\t')
+                #label = items[0]
+                #features = items[1].split()
 
-                iitems = []
-                for k, v in tmp_dic:
-                    iitems.extend(features[k:v])
-                out_str = label + '\t' + ' '.join(iitems)
-                fout.write(out_str + '\n')
+                #iitems = []
+                #for k, v in tmp_dic:
+                #    iitems.extend(features[k:v])
+                #out_str = label + '\t' + ' '.join(iitems)
+                #fout.write(out_str + '\n')
                 fout.write(line)
 

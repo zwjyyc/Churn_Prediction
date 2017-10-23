@@ -306,7 +306,7 @@ def strings_2_transactions(lines, user_id):
         payment_plan_days = int(items[1])
         plan_list_price = int(items[2])
         actual_amount_paid = int(items[3])
-        is_auto_renew = items[4]
+        is_auto_renew = int(items[4])
 
         transaction_date = datetime.date(2017, 10, 3)
         membership_expire_date = datetime.date(2017, 10, 3)

@@ -12,7 +12,7 @@ print_per_block = 1e5
 
 
 class FeatureExtractor(object):
-    def __init__(self, src):
+    def __init__(self, src = ''):
         self.train_csv = src + 'train.csv'
         self.test_csv = src + 'sample_submission_zero.csv'
         self.transactions_csv = src + 'transactions.csv'
@@ -27,17 +27,16 @@ class FeatureExtractor(object):
         self.users_test = {}
         self.is_loaded = os.path.exists(self.train_instances) and os.path.exists(self.test_instances)
         print self.is_loaded
-
-        assert os.path.exists(self.train_csv), 'train.csv does not exist'
-        assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
-        assert os.path.exists(self.transactions_csv), 'transactions.csv does not exist'
-        assert os.path.exists(self.user_logs_csv), 'user_logs.csv does not exist'
-        assert os.path.exists(self.members_csv), 'members.csv does not exist'
+        self.feature_templates = {}
 
         if not self.is_loaded:
+            assert os.path.exists(self.train_csv), 'train.csv does not exist'
+            assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
+            assert os.path.exists(self.transactions_csv), 'transactions.csv does not exist'
+            assert os.path.exists(self.user_logs_csv), 'user_logs.csv does not exist'
+            assert os.path.exists(self.members_csv), 'members.csv does not exist'
             self.load_raw_data()
 
-        self.feature_templates = {}
 
     def extract(self):
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'
@@ -140,6 +139,28 @@ class FeatureExtractor(object):
                 if user_id not in features:
                     features[user_id] = [label]
 
+                transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
+                log_end_time = None
+                if 'Trans' in self.feature_templates:
+                    feature, log_end_time = self.feature_templates['Trans'].transactions_2_features(transactions, is_train)
+                    features[user_id].extend(feature)
+                    if print_feature_info:
+                        print 'Trans'
+                        print feature
+                        feature_ind['Trans'] = [ind, ind + len(feature)]
+                        ind += len(feature)
+
+                logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
+                if 'HasLogInfo' in self.feature_templates:
+                    feature = [1] if logs else [0]
+                    features[user_id].extend(feature)
+                    if print_feature_info:
+                        print 'HasLogInfo'
+                        print feature
+                        feature_ind['HasLogInfo'] = [ind, ind + len(feature)]
+                        ind += len(feature)
+
+
                 if 'HasMemInfo' in self.feature_templates:
                     feature = [1] if member_info else [0]
                     features[user_id].extend(feature)
@@ -161,6 +182,8 @@ class FeatureExtractor(object):
                 
                 if 'ExpirationDate' in self.feature_templates:
                     feature = [(member_info.expiration_date - current_time_point).days / 30.0] if member_info else [0]
+                    #if member_info and log_end_time:
+                    #    feature[0] = (member_info.expiration_date - log_end_time).days / 30.0
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'ExpirationDate'
@@ -178,7 +201,7 @@ class FeatureExtractor(object):
                         ind += len(feature)
 
                 if 'RegisteredDays' in self.feature_templates:
-                    feature = [(current_time_point - member_info.registration_init_time) / 30.0] if member_info else [0]
+                    feature = [(current_time_point - member_info.registration_init_time).days / 30.0] if member_info else [0]
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'RegisteredDays'
@@ -216,16 +239,6 @@ class FeatureExtractor(object):
                         feature_ind['RegisteredVia'] = [ind, ind + len(feature)]
                         ind += len(feature)             
 
-                transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
-                if 'Trans' in self.feature_templates:
-                    feature = self.feature_templates['Trans'].transactions_2_features(transactions, is_train)
-                    features[user_id].extend(feature)
-                    if print_feature_info:
-                        print 'Trans'
-                        print feature
-                        feature_ind['Trans'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
                 logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
                 if 'HasLogInfo' in self.feature_templates:
                     feature = [1] if logs else [0]
@@ -237,7 +250,7 @@ class FeatureExtractor(object):
                         ind += len(feature)
 
                 if 'Logs' in self.feature_templates:
-                    feature = self.feature_templates['Logs'].logs_2_features(logs, is_train)
+                    feature = self.feature_templates['Logs'].logs_2_features(logs, log_end_time, is_train)
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'Logs'
