@@ -382,6 +382,10 @@ def generate_results(preds, ids, file):
     with open(file, 'w') as fout:
         fout.write('msno,is_churn\n')
         for pred, id in zip(preds, ids):
+            if pred >= 1.0:
+                pred = 0.99999
+            if pred <= 0:
+                pred = 0
             out_str = '%s,%.7f\n' % (id, pred)
             fout.write(out_str)
 

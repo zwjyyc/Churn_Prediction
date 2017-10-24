@@ -148,9 +148,12 @@ class FeatureTemplate(object):
         num_trans = 0
         for transaction in transactions:
             date = transaction.transaction_date
+            expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if (date - time_point_start).days <= 0 or \
-                                (date - time_point_end).days >= 0 or not is_ok:
+            if is_train and (expiration_date -  datetime.date(2017, 3, 1)).days >= 0:
+                continue
+
+            if (date - time_point_start).days <= 0  or not is_ok:
                     continue
             is_cancel = transaction.is_cancel
             if is_cancel == 1:
@@ -168,10 +171,14 @@ class FeatureTemplate(object):
         payment_plan_days_ind = 0
         for transaction in transactions:
             date = transaction.transaction_date
+            expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if (date - time_point_start).days <= 0 or \
-                                (date - time_point_end).days >= 0 or not is_ok:
+            if is_train and (expiration_date -  datetime.date(2017, 3, 1)).days >= 0:
+                continue         
+            
+            if (date - time_point_start).days <= 0 or  not is_ok:
                     continue
+            
 
             if (date - last_date).days > 0:
                 last_date = date
@@ -184,7 +191,7 @@ class FeatureTemplate(object):
             
             payment_plan_days = transaction.payment_plan_days
             if is_cancel == 0:
-                feature[ind] += payment_plan_days * 1.0
+                feature[ind] += payment_plan_days * 1.0 / 100
             if payment_plan_days_ind == 0:
                 payment_plan_days_ind = ind
             ind += 1
@@ -198,21 +205,21 @@ class FeatureTemplate(object):
 
             plan_list_price = transaction.plan_list_price
             if is_cancel == 0:
-                feature[ind] += plan_list_price * 1.0
+                feature[ind] += plan_list_price * 1.0 / 100
             if plan_list_price_ind == 0:
                 plan_list_price_ind = ind
             ind += 1
 
             actual_amount_paid = transaction.actual_amount_paid
             if is_cancel == 0:
-                feature[ind] += actual_amount_paid * 1.0
+                feature[ind] += actual_amount_paid * 1.0 / 100
             if actual_amount_pay_ind == 0:
                 actual_amount_pay_ind = ind 
             ind += 1
 
             for num in self.time_internal:
                 ind_ = (date - time_point_start).days * num / (days_gap + 1)
-                feature[ind + ind_] += 1.0 * payment_plan_days
+                feature[ind + ind_] += 1.0 * payment_plan_days / 100
                 ind += num
 
             payment_method_id = transaction.payment_method_id
@@ -235,15 +242,15 @@ class FeatureTemplate(object):
             return feature, None       
 
         payment_plan_days = last_instance.payment_plan_days
-        feature[ind] = payment_plan_days
+        feature[ind] = payment_plan_days / 100
         ind += 1
 
         plan_list_price = last_instance.plan_list_price
-        feature[ind] = plan_list_price
+        feature[ind] = plan_list_price / 100
         ind += 1
 
         actual_amount_paid = last_instance.actual_amount_paid
-        feature[ind] = actual_amount_paid
+        feature[ind] = actual_amount_paid / 100
         ind += 1
         
         discount_ratio = 1 - (actual_amount_paid + 1e-6) / (plan_list_price + 1e-6)
@@ -279,7 +286,7 @@ class FeatureTemplate(object):
         ind += 1
 
         plan_days_per_tran = feature[payment_plan_days_ind] / (num_trans + 1e-4)
-        feature[ind] = plan_days_per_tran
+        feature[ind] = plan_days_per_tran 
         ind += 1
 
         sorted_list = sorted(renew_dist.items(), key=lambda (k, v): (v, k), reverse=True)
@@ -334,15 +341,15 @@ class FeatureTemplate(object):
                 #ind += num
 
                 value = log.num_100 if log.num_100 <= 1000 else 1000
-                feature[ind + ind_] += value * 1.0 / num_logs
+                feature[ind + ind_] += value * 1.0 / (num_logs * 50)
                 ind += num
 
                 value = log.num_unq if log.num_unq <= 1000 else 1000
-                feature[ind + ind_] += value * 1.0 / num_logs
+                feature[ind + ind_] += value * 1.0 / (num_logs * 50)
                 ind += num
                 
                 value = log.total_secs if log.total_secs <= 24 * 60 * 60 else 24 * 60 * 60
-                feature[ind + ind_] += value * 1.0 / (num_logs * 60)
+                feature[ind + ind_] += value * 1.0 / (num_logs * 60 * 60)
                 ind += num
 
                 #feature[ind + ind_] += 1.0
