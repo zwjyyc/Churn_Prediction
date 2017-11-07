@@ -29,14 +29,13 @@ class FeatureExtractor(object):
         print self.is_loaded
         self.feature_templates = {}
 
-        if not self.is_loaded:
+        if True or not self.is_loaded:
             assert os.path.exists(self.train_csv), 'train.csv does not exist'
             assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
             assert os.path.exists(self.transactions_csv), 'transactions.csv does not exist'
             assert os.path.exists(self.user_logs_csv), 'user_logs.csv does not exist'
             assert os.path.exists(self.members_csv), 'members.csv does not exist'
             self.load_raw_data()
-
 
     def extract(self):
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'
@@ -86,10 +85,6 @@ class FeatureExtractor(object):
                 if 'Gender' in self.feature_templates and member_info:
                     gender = member_info.gender
                     self.feature_templates['Gender'].add_value(gender, label)
-
-                if 'RegisteredDays' in self.feature_templates and member_info:
-                    registered_days = member_info.registered_days
-                    self.feature_templates['RegisteredDays'].add_value(registered_days, label)
 
                 if 'RegisteredVia' in self.feature_templates and member_info:
                     registered_via = member_info.registered_via
@@ -160,7 +155,6 @@ class FeatureExtractor(object):
                         feature_ind['HasLogInfo'] = [ind, ind + len(feature)]
                         ind += len(feature)
 
-
                 if 'HasMemInfo' in self.feature_templates:
                     feature = [1] if member_info else [0]
                     features[user_id].extend(feature)
@@ -179,21 +173,6 @@ class FeatureExtractor(object):
                         print feature
                         feature_ind['Age'] = [ind, ind + len(feature)]                      
                         ind += len(feature)
-                
-                if 'ExpirationDate' in self.feature_templates:
-                    feature = [(member_info.expiration_date - current_time_point).days / 30.0] if member_info else [0]
-                    if member_info and log_end_time and (log_end_time - member_info.expiration_date).days == 0:
-                        feature.extend([1])
-                    else:
-                        feature.extend([0])
-                    #if member_info and log_end_time:
-                    #    feature[0] = (member_info.expiration_date - log_end_time).days / 30.0
-                    features[user_id].extend(feature)
-                    if print_feature_info:
-                        print 'ExpirationDate'
-                        print feature
-                        feature_ind['ExpirationDate'] = [ind, ind + len(feature)]
-                        ind += len(feature) 
 
                 if 'RegistrationInitTime' in self.feature_templates:
                     feature = [(member_info.registration_init_time - start_time_point).days / 30.0] if member_info else [0]
@@ -203,15 +182,6 @@ class FeatureExtractor(object):
                         print feature
                         feature_ind['RegistrationInitTime'] = [ind, ind + len(feature)]
                         ind += len(feature)
-
-                if 'RegisteredDays' in self.feature_templates:
-                    feature = [(current_time_point - member_info.registration_init_time).days / 30.0] if member_info else [0]
-                    features[user_id].extend(feature)
-                    if print_feature_info:
-                        print 'RegisteredDays'
-                        print feature
-                        feature_ind['RegisteredDays'] = [ind, ind + len(feature)]
-                        ind += len(feature)                        
 
                 if 'City' in self.feature_templates:
                     value = member_info.city if member_info else None

@@ -46,7 +46,7 @@ def load_members(src, train_users, test_users):
                 flag = True
             else:
                 items = line.strip().split(',')
-                if len(items) != num_column:
+                if True or len(items) != num_column:
                     err_print = 'wrong input %s' % line
                     print err_print
                 else:
@@ -58,6 +58,7 @@ def load_members(src, train_users, test_users):
                         test_users[user_id].add_member_info(','.join(items[1:]))
                         match += 1
     print 'matched %d/%d' % (match, len(test_users) + len(train_users))
+
 
 def load_logs(src, train_users, test_users):
     with open(src, 'r') as fin:
@@ -242,7 +243,7 @@ def string_2_member(line, user_id):
     registration_init_time = datetime.date(2017, 10, 3)
     expiration_date = datetime.date(2017, 10, 3)
 
-    if len(items[4]) != 8 or len(items[5]) != 8:
+    if len(items[4]) != 8:
         err_print = 'wrong input %s' % line
         print err_print
         return None
@@ -252,14 +253,13 @@ def string_2_member(line, user_id):
         day = int(items[4][6:8])
         registration_init_time = datetime.date(year, mon, day)
 
-        year = int(items[5][:4])
-        mon = int(items[5][4:6])
-        day = int(items[5][6:8])
-        expiration_date = datetime.date(year, mon, day)
+        # year = int(items[5][:4])
+        # mon = int(items[5][4:6])
+        # day = int(items[5][6:8])
+        # expiration_date = datetime.date(year, mon, day)
         member = base_yyc.MemberInstance(user_id, city, age, gender,
                                          registered_via,
-                                         registration_init_time,
-                                         expiration_date)
+                                         registration_init_time)
         return member
 
 

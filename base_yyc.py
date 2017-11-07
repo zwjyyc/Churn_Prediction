@@ -54,7 +54,7 @@ class LogInstance(object):
 
 
 class MemberInstance(object):
-    def __init__(self, user_id, city, age, gender, registered_via, registration_init_time, expiration_date):
+    def __init__(self, user_id, city, age, gender, registered_via, registration_init_time, expiration_date=None):
         self.user_id = user_id
         self.city = city
         self.age = age
@@ -62,7 +62,7 @@ class MemberInstance(object):
         self.registered_via = registered_via
         self.registration_init_time = registration_init_time
         self.expiration_date = expiration_date
-        self.registered_days = (expiration_date - registration_init_time).days
+        #self.registered_days = (expiration_date - registration_init_time).days
 
 
 class FeatureType:

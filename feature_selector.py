@@ -11,9 +11,9 @@ class FeatureSelector(object):
 
         self.train_ratio = 0.2
 
-        self.feature_set = ['Age', 'RegisteredDays', 'City', 'Gender', 'RegisteredVia',\
-                            'Trans', 'ExpirationDate', 'TotalSecs', 'NumUnq', 'Num25', 'Num50', 'Num75',\
-                            'Num985', 'Num100', 'RegistrationInitTime', 'ExpirationDate']
+        self.feature_set = ['Age', 'City', 'Gender', 'RegisteredVia',\
+                            'Trans', 'TotalSecs', 'NumUnq', 'Num25', 'Num50', 'Num75',\
+                            'Num985', 'Num100', 'RegistrationInitTime']
 
         feature_ind_src = src + 'dist.train.featureind'
         
