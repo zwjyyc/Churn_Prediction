@@ -137,7 +137,7 @@ class FeatureTemplate(object):
             time_point_end = datetime.date(2017, 2, 1)
 
         if self.dim < 0:
-            cnt = 17
+            cnt = 19
             for num in self.time_internal:
                 cnt += num
             cnt += 2 * (len(self.method_map) + 1)
@@ -179,13 +179,16 @@ class FeatureTemplate(object):
             if (date - time_point_start).days <= 0 or  not is_ok:
                     continue
             
-
             if (date - last_date).days > 0:
                 last_date = date
                 last_instance = transaction
 
-            ind = 1
             is_cancel = transaction.is_cancel
+            if (date - last_date).days == 0 and is_cancel:
+                    last_date = date
+                    last_instance = transaction
+                    
+            ind = 1
             feature[ind] += is_cancel / (num_trans + 1e-6)
             ind += 1
             
@@ -240,6 +243,18 @@ class FeatureTemplate(object):
         # features of last instance
         if not last_instance:
             return feature, None       
+        
+        
+        transaction_date = last_instance.transaction_date
+        membership_expire_date = last_instance.membership_expire_date
+        days = (membership_expire_date - transaction_date).days
+        feature[ind] = days / 30
+        ind += 1        
+
+        error_days = payment_plan_days - days #(membership_expire_date - transaction_date).days
+        if error_days <= -10 or error_days >= 10:
+            feature[ind] += 1
+        ind += 1
 
         payment_plan_days = last_instance.payment_plan_days
         feature[ind] = payment_plan_days / 100
@@ -265,13 +280,6 @@ class FeatureTemplate(object):
         is_auto_renew = last_instance.is_auto_renew
         feature[ind] = is_auto_renew
         ind += 1
-        #ind_ = self.renew_map.get(is_auto_renew, 0)
-        #feature[ind + ind_] = 1
-        #ind += len(self.renew_map) + 1
-        
-        #transaction_date = (time_point_end - last_instance.transaction_date).days / 30.0
-        #feature[ind] = transaction_date
-        #ind += 1
         
         is_cancel = last_instance.is_cancel
         feature[ind] = is_cancel

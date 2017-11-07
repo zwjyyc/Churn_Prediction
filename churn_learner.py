@@ -35,7 +35,7 @@ class ChurnLearner(object):
         self.k_fold = 5
         self.models = {'xgboost': {'max_depth': 7, 'eta': 0.02, 'silent': 1, 'objective': 'binary:logistic',
                                    'eval_metric': 'logloss'}, 'libsvm': {'train': '-t 0 -c 4 -b 1 ', 'pred': '-b 1'},
-                                   'liblinear': {'train': '-s 0 -c 16 -B 1', 'pred': '-b 1'},
+                                   'liblinear': {'train': '-s 0 -c 8 -B 1', 'pred': '-b 1'},
                                     #'lgb': {'max_depth': 6, 'metric': 'binary_logloss', 'num_threads': 4}}
                                     'lgb': {'learning_rate': 0.1, 'num_leaves': 200, 'num_trees': 200, 'num_threads': 4, \
                                     'min_data_in_leaf': 0, 'min_sum_hessian_in_leaf': 100, 'metric': 'binary_logloss'}}
@@ -60,7 +60,7 @@ class ChurnLearner(object):
 
             x1, x2, y1, y2 = train_test_split(train_x, train_y, test_size=0.3, random_state=0)
             watchlist = [(xgb.DMatrix(x1, y1), 'train'), (xgb.DMatrix(x2, y2), 'valid')]
-            model = xgb.train(params, xgb.DMatrix(x1, y1), 150,  watchlist,  maximize=False, verbose_eval=5,
+            model = xgb.train(params, xgb.DMatrix(x1, y1), 175,  watchlist,  maximize=False, verbose_eval=5,
                               early_stopping_rounds=50) #use 1500
             print 'done'
             print 'xgboost predict begins'
@@ -121,7 +121,7 @@ class ChurnLearner(object):
             util_yyc.generate_results(preds, self.data2_ids, pred_file)
             return
 
-        if 'liblinear' in self.models and False:
+        if 'liblinear' in self.models and True:
             params = self.models['liblinear']
             print 'liblinear train begins'
             train_y, train_x = liblinearutil.svm_read_problem(self.data1_src)

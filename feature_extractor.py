@@ -182,6 +182,10 @@ class FeatureExtractor(object):
                 
                 if 'ExpirationDate' in self.feature_templates:
                     feature = [(member_info.expiration_date - current_time_point).days / 30.0] if member_info else [0]
+                    if member_info and log_end_time and (log_end_time - member_info.expiration_date).days == 0:
+                        feature.extend([1])
+                    else:
+                        feature.extend([0])
                     #if member_info and log_end_time:
                     #    feature[0] = (member_info.expiration_date - log_end_time).days / 30.0
                     features[user_id].extend(feature)
