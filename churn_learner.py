@@ -60,7 +60,7 @@ class ChurnLearner(object):
 
             x1, x2, y1, y2 = train_test_split(train_x, train_y, test_size=0.3, random_state=0)
             watchlist = [(xgb.DMatrix(x1, y1), 'train'), (xgb.DMatrix(x2, y2), 'valid')]
-            model = xgb.train(params, xgb.DMatrix(x1, y1), 175,  watchlist,  maximize=False, verbose_eval=5,
+            model = xgb.train(params, xgb.DMatrix(x1, y1), 225,  watchlist,  maximize=False, verbose_eval=5,
                               early_stopping_rounds=50) #use 1500
             print 'done'
             print 'xgboost predict begins'
@@ -121,7 +121,7 @@ class ChurnLearner(object):
             util_yyc.generate_results(preds, self.data2_ids, pred_file)
             return
 
-        if 'liblinear' in self.models and True:
+        if 'liblinear' in self.models and False:
             params = self.models['liblinear']
             print 'liblinear train begins'
             train_y, train_x = liblinearutil.svm_read_problem(self.data1_src)
