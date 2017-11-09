@@ -128,13 +128,13 @@ class FeatureTemplate(object):
     def transactions_2_features(self, transactions, is_train):
         time_point_start = self.time_boundary[0]
         time_point_end = self.time_boundary[1]
-        time_point_start = datetime.date(2016, 3, 1)
-        time_point_end = datetime.date(2017, 3, 1)
+        time_point_start = datetime.date(2010, 3, 1)
+        time_point_end = datetime.date(2017, 4, 1)
 
         days_gap = (time_point_end - time_point_start).days
         if is_train:
-            time_point_start = datetime.date(2016, 2, 1)
-            time_point_end = datetime.date(2017, 2, 1)
+            time_point_start = datetime.date(2010, 2, 1)
+            time_point_end = datetime.date(2017, 3, 1)
 
         if self.dim < 0:
             cnt = 19
@@ -150,7 +150,7 @@ class FeatureTemplate(object):
             date = transaction.transaction_date
             expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if is_train and (expiration_date -  datetime.date(2017, 3, 1)).days >= 0:
+            if is_train and (expiration_date -  datetime.date(2017, 4, 1)).days >= 0:
                 continue
 
             if (date - time_point_start).days <= 0  or not is_ok:
@@ -173,7 +173,7 @@ class FeatureTemplate(object):
             date = transaction.transaction_date
             expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if is_train and (expiration_date -  datetime.date(2017, 3, 1)).days >= 0:
+            if is_train and (expiration_date -  datetime.date(2017, 4, 1)).days >= 0:
                 continue         
             
             if (date - time_point_start).days <= 0 or  not is_ok:
@@ -313,7 +313,7 @@ class FeatureTemplate(object):
         if not logs or not time_point_end:
             return feature
 
-        last_date = datetime.date(2016, 1, 1)
+        last_date = datetime.date(2010, 1, 1)
         time_point_start = time_point_end - datetime.timedelta(30)
         days_gap = 30
         num_logs = 0
@@ -329,7 +329,7 @@ class FeatureTemplate(object):
                 last_date = date
 
         ind = 0
-        day_delta = (time_point_end - datetime.date(2017, 2, 28)).days
+        day_delta = (time_point_end - datetime.date(2017, 3, 31)).days
         feature[ind] = num_logs if day_delta <= 0 else math.sqrt(30.0 / day_delta) * num_logs
         
         ind += 1

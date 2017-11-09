@@ -46,15 +46,15 @@ def load_members(src, train_users, test_users):
                 flag = True
             else:
                 items = line.strip().split(',')
-                if True or len(items) != num_column:
+                if False and len(items) != num_column:
                     err_print = 'wrong input %s' % line
                     print err_print
                 else:
                     user_id = items[0]
-                    if user_id in train_users:
+                    if user_id in train_users and not train_users[user_id].member_info:
                         train_users[user_id].add_member_info(','.join(items[1:]))
                         match += 1
-                    if user_id in test_users:
+                    if user_id in test_users and not test_users[user_id].member_info:
                         test_users[user_id].add_member_info(','.join(items[1:]))
                         match += 1
     print 'matched %d/%d' % (match, len(test_users) + len(train_users))
@@ -241,7 +241,6 @@ def string_2_member(line, user_id):
     registered_via = int(items[3])
 
     registration_init_time = datetime.date(2017, 10, 3)
-    expiration_date = datetime.date(2017, 10, 3)
 
     if len(items[4]) != 8:
         err_print = 'wrong input %s' % line

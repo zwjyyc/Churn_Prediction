@@ -20,8 +20,8 @@ class FeatureExtractor(object):
         self.members_csv = src + 'members.csv'
         #
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
-        self.train_instances = src_ + 'instances.train.dump'
-        self.test_instances = src_ + 'instances.test.dump'
+        self.train_instances = src_ + 'instances.train.dump.v2'
+        self.test_instances = src_ + 'instances.test.dump.v2'
 
         self.users_train = {}
         self.users_test = {}
@@ -29,7 +29,7 @@ class FeatureExtractor(object):
         print self.is_loaded
         self.feature_templates = {}
 
-        if True or not self.is_loaded:
+        if not self.is_loaded:
             assert os.path.exists(self.train_csv), 'train.csv does not exist'
             assert os.path.exists(self.test_csv), 'sample_submission_zero.csv does not exist'
             assert os.path.exists(self.transactions_csv), 'transactions.csv does not exist'
@@ -97,7 +97,7 @@ class FeatureExtractor(object):
             file_name = outfile + name
             util_yyc.dict_dict_2_file(feature_template.value_dist, feature_template.label_dist, file_name)
 
-        current_time_point = datetime.date(2017, 4, 1)
+        current_time_point = datetime.date(2017, 5, 1)
         start_time_point = datetime.date(2016, 1, 1)
         if is_train:
             current_time_point -= datetime.timedelta(30)
