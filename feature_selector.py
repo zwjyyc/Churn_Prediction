@@ -6,6 +6,7 @@ import util_yyc
 class FeatureSelector(object):
     def __init__(self, src, use_all=True):
         self.src = src
+        self.data0_src = src + 'dist.old.train.rawfeatures'
         self.data1_src = src + 'dist.train.rawfeatures'
         self.data2_src = src + 'dist.test.rawfeatures'
 
@@ -25,11 +26,12 @@ class FeatureSelector(object):
         self.feature_ind = util_yyc.load_feature_ind(feature_ind_src)
     
     def select(self):
-       
+        data0_out = self.src + 'dist.old.train.features'
         data1_out = self.src + 'dist.train.features'
         data2_out = self.src + 'dist.test.features' 
         #data3_out = self.src + 'dist.valid.features'
         if self.use_all:
+            shutil.copyfile(self.data0_src, data0_out)
             shutil.copyfile(self.data1_src, data1_out)
             shutil.copyfile(self.data2_src, data2_out)
             #shutil.copyfile(self.data3_src, data3_out)

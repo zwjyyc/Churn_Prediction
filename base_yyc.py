@@ -125,7 +125,7 @@ class FeatureTemplate(object):
             feature[self.id_map.get(value, 0)] = 1
         return feature
 
-    def transactions_2_features(self, transactions, is_train):
+    def transactions_2_features(self, transactions, is_train, is_old):
         time_point_start = self.time_boundary[0]
         time_point_end = self.time_boundary[1]
         time_point_start = datetime.date(2010, 3, 1)
@@ -134,7 +134,10 @@ class FeatureTemplate(object):
         days_gap = (time_point_end - time_point_start).days
         if is_train:
             time_point_start = datetime.date(2010, 2, 1)
-            time_point_end = datetime.date(2017, 3, 1)
+            time_point_end = datetime.date(2017, 4, 1)
+            if is_old:
+                time_point_start = datetime.date(2010, 1, 1)
+                time_point_end = datetime.date(2017, 3, 1)
 
         if self.dim < 0:
             cnt = 19
@@ -150,11 +153,15 @@ class FeatureTemplate(object):
             date = transaction.transaction_date
             expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if is_train and (expiration_date -  datetime.date(2017, 4, 1)).days >= 0:
+            if is_train and (expiration_date - time_point_end).days >= 0:
                 continue
 
-            if (date - time_point_start).days <= 0  or not is_ok:
+            if is_train and is_old and (expiration_date - time_point_end).days >= 0:
+                continue
+
+            if (date - time_point_start).days <= 0 or not is_ok:
                     continue
+
             is_cancel = transaction.is_cancel
             if is_cancel == 1:
                 continue
@@ -173,12 +180,15 @@ class FeatureTemplate(object):
             date = transaction.transaction_date
             expiration_date = transaction.membership_expire_date
             is_ok = transaction.is_ok
-            if is_train and (expiration_date -  datetime.date(2017, 4, 1)).days >= 0:
+            if is_train and (expiration_date - time_point_end).days >= 0:
                 continue         
             
-            if (date - time_point_start).days <= 0 or  not is_ok:
+            if (date - time_point_start).days <= 0 or not is_ok:
                     continue
-            
+
+            if is_train and is_old and (expiration_date - time_point_end).days >= 0:
+                continue
+
             if (date - last_date).days > 0:
                 last_date = date
                 last_instance = transaction
@@ -302,7 +312,7 @@ class FeatureTemplate(object):
         ind += 1
         return feature, last_instance.membership_expire_date
 
-    def logs_2_features(self, logs, time_point_end, is_train):
+    def logs_2_features(self, logs, time_point_end):
         if self.dim < 0:
             cnt = 1
             for num in self.time_internal:

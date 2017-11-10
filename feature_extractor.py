@@ -20,7 +20,7 @@ class FeatureExtractor(object):
         self.members_csv = src + 'members.csv'
         #
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
-        self.train_instances = src_ + 'instances.train.dump.v2'
+        self.train_instances = src_ + 'instances.train.dump'
         self.test_instances = src_ + 'instances.test.dump.v2'
 
         self.users_train = {}
@@ -43,15 +43,16 @@ class FeatureExtractor(object):
         assert os.path.exists(config_file), 'configure.in does not exist'
         util_yyc.load_configure(config_file, self.feature_templates)
 
-        features_train_file = src_ + 'dist.train.'
+        features_train_file = src_ + 'dist.old.train.'
         features_test_file = src_ + 'dist.test.'
         
         #data2 = self.build_features(self.test_instances,  features_test_file)
         is_train = True
-        data1 = self.build_features(self.train_instances, features_train_file, is_train=is_train)
-        data2 = self.build_features(self.test_instances,  features_test_file)
+        is_old = True
+        self.build_features(self.train_instances, features_train_file, is_train=is_train, is_old=is_old)
+        #data2 = self.build_features(self.test_instances,  features_test_file)
 
-    def build_features(self, src, outfile, old_features=None, is_train=False):
+    def build_features(self, src, outfile, old_features=None, is_train=False, is_old=False):
         # fill feature_templates
         features = {}
         with open(src, 'r') as fin:
@@ -102,6 +103,9 @@ class FeatureExtractor(object):
         if is_train:
             current_time_point -= datetime.timedelta(30)
             start_time_point -= datetime.timedelta(30)
+            if is_old:
+                current_time_point -= datetime.timedelta(30)
+                start_time_point -= datetime.timedelta(30)
 
         print_feature_info = True
         feature_ind = {}
@@ -137,7 +141,7 @@ class FeatureExtractor(object):
                 transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
                 log_end_time = None
                 if 'Trans' in self.feature_templates:
-                    feature, log_end_time = self.feature_templates['Trans'].transactions_2_features(transactions, is_train)
+                    feature, log_end_time = self.feature_templates['Trans'].transactions_2_features(transactions, is_train , is_old)
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'Trans'
@@ -224,7 +228,7 @@ class FeatureExtractor(object):
                         ind += len(feature)
 
                 if 'Logs' in self.feature_templates:
-                    feature = self.feature_templates['Logs'].logs_2_features(logs, log_end_time, is_train)
+                    feature = self.feature_templates['Logs'].logs_2_features(logs, log_end_time)
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'Logs'

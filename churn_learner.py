@@ -20,6 +20,7 @@ import gc; gc.enable()
 
 class ChurnLearner(object):
     def __init__(self, src, configure = ''):
+        self.data0_src = src + 'dist.old.train.features'
         self.data1_src = src + 'dist.train.features'
         self.data2_src = src + 'dist.test.features'
         data2_src_ids = src + 'dist.test.ids'
@@ -50,7 +51,10 @@ class ChurnLearner(object):
         if 'xgboost' in self.models and True:
             params = self.models['xgboost']
             print 'xgboost train begins'
+            old_train_x, old_train_y = util_yyc.svminput_2_list(self.data0_src)
             train_x, train_y = util_yyc.svminput_2_list(self.data1_src)
+            train_x.extend(old_train_x)
+            train_y.extend(old_train_y)
             train_x = np.array(train_x)
             train_y = np.array(train_y)
             
