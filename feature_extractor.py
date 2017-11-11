@@ -149,16 +149,6 @@ class FeatureExtractor(object):
                         feature_ind['Trans'] = [ind, ind + len(feature)]
                         ind += len(feature)
 
-                logs = util_yyc.strings_2_logs(user_instance.logs, user_instance.user_id)
-                if 'HasLogInfo' in self.feature_templates:
-                    feature = [1] if logs else [0]
-                    features[user_id].extend(feature)
-                    if print_feature_info:
-                        print 'HasLogInfo'
-                        print feature
-                        feature_ind['HasLogInfo'] = [ind, ind + len(feature)]
-                        ind += len(feature)
-
                 if 'HasMemInfo' in self.feature_templates:
                     feature = [1] if member_info else [0]
                     features[user_id].extend(feature)
