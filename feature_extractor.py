@@ -20,12 +20,13 @@ class FeatureExtractor(object):
         self.members_csv = src + 'members.csv'
         #
         src_ = '/home/yyc/Code/WSDM_ChurnPrediction/data/'#'/data2/kkbox/Churn_Prediction/src/yyc/data/'
-        self.train_instances = src_ + 'instances.train.dump'
+        self.train_old_instances = src_ + 'instances.train.dump'
+        self.train_instances = src_ + 'instances.train.dump.v2'
         self.test_instances = src_ + 'instances.test.dump.v2'
 
         self.users_train = {}
         self.users_test = {}
-        self.is_loaded = os.path.exists(self.train_instances) and os.path.exists(self.test_instances)
+        self.is_loaded = os.path.exists(self.train_instances) and os.path.exists(self.test_instances) and os.path.exists(self.train_old_instances)
         print self.is_loaded
         self.feature_templates = {}
 
@@ -43,14 +44,13 @@ class FeatureExtractor(object):
         assert os.path.exists(config_file), 'configure.in does not exist'
         util_yyc.load_configure(config_file, self.feature_templates)
 
-        features_train_file = src_ + 'dist.old.train.'
+        features_old_train_file = src_ + 'dist.old.train.'
+        features_train_file = src_ + 'dist.train.'
         features_test_file = src_ + 'dist.test.'
         
-        #data2 = self.build_features(self.test_instances,  features_test_file)
-        is_train = True
-        is_old = True
-        self.build_features(self.train_instances, features_train_file, is_train=is_train, is_old=is_old)
-        #data2 = self.build_features(self.test_instances,  features_test_file)
+        self.build_features(self.train_old_instances, features_old_train_file, is_train=True, is_old=True)
+        self.build_features(self.train_instances, features_train_file, is_train=True)
+        self.build_features(self.test_instances,  features_test_file)
 
     def build_features(self, src, outfile, old_features=None, is_train=False, is_old=False):
         # fill feature_templates
