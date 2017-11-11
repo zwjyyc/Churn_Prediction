@@ -57,14 +57,14 @@ class ChurnLearner(object):
             train_y.extend(old_train_y)
             train_x = np.array(train_x)
             train_y = np.array(train_y)
-            
+            print len(train_x)
             test_x, test_y = util_yyc.svminput_2_list(self.data2_src)
             test_x = np.array(test_x)
             test_y = np.array(test_y)            
 
             x1, x2, y1, y2 = train_test_split(train_x, train_y, test_size=0.3, random_state=0)
             watchlist = [(xgb.DMatrix(x1, y1), 'train'), (xgb.DMatrix(x2, y2), 'valid')]
-            model = xgb.train(params, xgb.DMatrix(x1, y1), 225,  watchlist,  maximize=False, verbose_eval=5,
+            model = xgb.train(params, xgb.DMatrix(x1, y1), 400,  watchlist,  maximize=False, verbose_eval=5,
                               early_stopping_rounds=50) #use 1500
             print 'done'
             print 'xgboost predict begins'
