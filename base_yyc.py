@@ -126,18 +126,16 @@ class FeatureTemplate(object):
         return feature
 
     def transactions_2_features(self, transactions, is_train, is_old):
-        time_point_start = self.time_boundary[0]
-        time_point_end = self.time_boundary[1]
         time_point_start = datetime.date(2010, 3, 1)
         time_point_end = datetime.date(2017, 4, 1)
 
         days_gap = (time_point_end - time_point_start).days
         if is_train:
             time_point_start = datetime.date(2010, 2, 1)
-            time_point_end = datetime.date(2017, 4, 1)
+            time_point_end = datetime.date(2017, 3, 1)
             if is_old:
                 time_point_start = datetime.date(2010, 1, 1)
-                time_point_end = datetime.date(2017, 3, 1)
+                time_point_end = datetime.date(2017, 2, 1)
 
         if self.dim < 0:
             cnt = 19
@@ -253,8 +251,7 @@ class FeatureTemplate(object):
         # features of last instance
         if not last_instance:
             return feature, None       
-        
-        
+               
         transaction_date = last_instance.transaction_date
         membership_expire_date = last_instance.membership_expire_date
         days = (membership_expire_date - transaction_date).days

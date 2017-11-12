@@ -141,7 +141,7 @@ class FeatureExtractor(object):
                 transactions = util_yyc.strings_2_transactions(user_instance.transactions, user_instance.user_id)
                 log_end_time = None
                 if 'Trans' in self.feature_templates:
-                    feature, log_end_time = self.feature_templates['Trans'].transactions_2_features(transactions, is_train , is_old)
+                    feature, log_end_time = self.feature_templates['Trans'].transactions_2_features(transactions, is_train, is_old)
                     features[user_id].extend(feature)
                     if print_feature_info:
                         print 'Trans'
